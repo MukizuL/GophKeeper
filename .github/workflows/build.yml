@@ -1,0 +1,62 @@
+name: Go Build Matrix
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }} ${{ matrix.os }} ${{ matrix.arch }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        os: [linux, windows, darwin]
+        arch: [amd64, arm64]
+        target: [client, server]  # <- Build both cmd/client and cmd/server
+
+    env:
+      VERSION: v0.0.1
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Install git (for metadata)
+        run: sudo apt-get update && sudo apt-get install -y git
+
+      - name: Get build metadata
+        id: meta
+        run: |
+          echo "commit=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "date=$(date +'%Y/%m/%d %H:%M:%S')" >> $GITHUB_OUTPUT
+
+      - name: Set GOOS and GOARCH
+        run: |
+          echo "GOOS=${{ matrix.os }}" >> $GITHUB_ENV
+          echo "GOARCH=${{ matrix.arch }}" >> $GITHUB_ENV
+
+      - name: Build ${{ matrix.target }}
+        run: |
+          mkdir -p build/${{ matrix.target }}/${{ matrix.os }}-${{ matrix.arch }}
+
+          output="build/${{ matrix.target }}/${{ matrix.os }}-${{ matrix.arch }}/${{ matrix.target }}"
+          [[ "${{ matrix.os }}" == "windows" ]] && output="$output.exe"
+
+          go build \
+            -o "$output" \
+            -ldflags "-X main.buildVersion=${{ env.VERSION }} -X 'main.buildDate=${{ steps.meta.outputs.date }}' -X main.buildCommit=${{ steps.meta.outputs.commit }}" \
+            ./cmd/${{ matrix.target }}
+
+      - name: Upload ${{ matrix.target }} binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target }}-${{ matrix.os }}-${{ matrix.arch }}
+          path: build/${{ matrix.target }}/${{ matrix.os }}-${{ matrix.arch }}
