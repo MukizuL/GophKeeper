@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package gophkeeper;
+
+option go_package = "github.com/MukizuL/GophKeeper/proto";
+
+// Register a new user
+message RegisterRequest {
+  string login = 1;
+  string password = 2;
+}
+
+message RegisterResponse {
+
+}
+
+// Authentication
+message AuthRequest {
+  string login = 1;
+  string password = 2;
+}
+
+message AuthResponse {
+
+}
+
+service gophkeeper {
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc Authorize(AuthRequest) returns (AuthResponse);
+}
