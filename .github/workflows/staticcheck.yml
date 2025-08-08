@@ -1,0 +1,19 @@
+name: staticcheck
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  ci:
+    name: "Run staticcheck"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+    - uses: dominikh/staticcheck-action@v1
+      with:
+        version: "latest"
