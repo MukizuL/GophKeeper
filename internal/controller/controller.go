@@ -8,12 +8,12 @@ import (
 )
 
 type Controller struct {
-	storage  storage.Repo
+	storage  storage.Repository
 	services *services.Services
 	pb.UnimplementedGophkeeperServer
 }
 
-func newController(storage storage.Repo, services *services.Services) *Controller {
+func newController(storage storage.Repository, services *services.Services) *Controller {
 	return &Controller{
 		storage:  storage,
 		services: services,

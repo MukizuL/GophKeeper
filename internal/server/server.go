@@ -23,7 +23,7 @@ type GRPCFxIn struct {
 	Cfg         *config.Config
 	Logger      *zap.Logger
 	Interceptor *interceptor.Service
-	Storage     storage.Repo
+	Storage     storage.Repository
 	Migrator    *migration.Migrator
 }
 

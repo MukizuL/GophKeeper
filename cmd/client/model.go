@@ -16,7 +16,7 @@ const (
 )
 
 var (
-	titleStyle        = lipgloss.NewStyle().MarginLeft(2)
+	listTitleStyle    = lipgloss.NewStyle().MarginLeft(2)
 	itemStyle         = lipgloss.NewStyle().PaddingLeft(4)
 	selectedItemStyle = lipgloss.NewStyle().PaddingLeft(2).Foreground(lipgloss.Color("170"))
 	blurredStyle      = lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
@@ -24,7 +24,19 @@ var (
 	helpStyle         = list.DefaultStyles().HelpStyle.PaddingLeft(4).PaddingBottom(1)
 	quitTextStyle     = lipgloss.NewStyle().Margin(1, 0, 2, 4)
 
-	backButton = itemStyle.Render(fmt.Sprintf("[ %s ]", lipgloss.NewStyle().Foreground(lipgloss.Color("170")).Render("Back")))
+	formStyle         = lipgloss.NewStyle().PaddingLeft(4)
+	formSelectedStyle = lipgloss.NewStyle().PaddingLeft(4).Foreground(lipgloss.Color("170"))
+
+	titleStyle          = lipgloss.NewStyle().PaddingLeft(4)
+	errorStyle          = lipgloss.NewStyle().PaddingLeft(4).Foreground(lipgloss.Color("9"))
+	successStyle        = lipgloss.NewStyle().PaddingLeft(4).Foreground(lipgloss.Color("2"))
+	selectedButtonStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("170"))
+
+	okButton        = itemStyle.Render("[ OK ]")
+	okButtonFocused = itemStyle.Render(selectedButtonStyle.Render("[ OK ]"))
+
+	backButton        = itemStyle.Render("[ Back ]")
+	backButtonFocused = itemStyle.Render(selectedButtonStyle.Render("[ Back ]"))
 )
 
 type item string
@@ -55,9 +67,12 @@ func (d itemDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 }
 
 type model struct {
-	start  start
-	about  about
-	window string
+	token    string
+	start    start
+	about    about
+	register register
+	login    login
+	window   string
 }
 
 func (m model) Init() tea.Cmd {
@@ -77,6 +92,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return updateStart(msg, m)
 	case "about":
 		return updateAbout(msg, m)
+	case "register":
+		return updateRegister(msg, m)
+	case "login":
+		return updateLogin(msg, m)
 	default:
 		return m, nil
 	}
@@ -88,7 +107,11 @@ func (m model) View() string {
 		return viewStart(m)
 	case "about":
 		return viewAbout(m)
+	case "register":
+		return viewRegister(m)
+	case "login":
+		return viewLogin(m)
 	default:
-		return "Unknown window"
+		return fmt.Sprintf("Unknown window. token = %s", m.token)
 	}
 }

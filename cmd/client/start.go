@@ -1,26 +1,28 @@
 package main
 
 import (
-	listB "github.com/charmbracelet/bubbles/list"
+	"strings"
+
+	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 type start struct {
-	list listB.Model
+	list list.Model
 }
 
 func newStart() start {
-	startItems := []listB.Item{
+	startItems := []list.Item{
 		item("Login"),
 		item("Create new account"),
 		item("About"),
 	}
 
-	l := listB.New(startItems, itemDelegate{}, defaultWidth, listHeight)
+	l := list.New(startItems, itemDelegate{}, defaultWidth, listHeight)
 	l.Title = "Welcome to GophKeeper"
 	l.SetShowStatusBar(false)
 	l.SetFilteringEnabled(false)
-	l.Styles.Title = titleStyle
+	l.Styles.Title = listTitleStyle
 	l.Styles.PaginationStyle = paginationStyle
 	l.Styles.HelpStyle = helpStyle
 
@@ -43,8 +45,10 @@ func updateStart(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 				switch i {
 				case "Login":
 					m.window = "login"
+					m.login.inputs[0].Focus()
 				case "Create new account":
-					m.window = "create-account"
+					m.window = "register"
+					m.register.inputs[0].Focus()
 				case "About":
 					m.window = "about"
 				}
@@ -58,5 +62,13 @@ func updateStart(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 }
 
 func viewStart(m model) string {
-	return "\n" + m.start.list.View()
+	var b strings.Builder
+
+	if m.register.success {
+		b.WriteString(successStyle.Render("Account created"))
+	}
+	b.WriteString("\n")
+	b.WriteString(m.start.list.View())
+
+	return b.String()
 }

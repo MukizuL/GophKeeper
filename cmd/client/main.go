@@ -3,34 +3,77 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 
+	pb "github.com/MukizuL/GophKeeper/internal/proto"
 	tea "github.com/charmbracelet/bubbletea"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 var (
 	buildVersion string
 	buildDate    string
 	buildCommit  string
+
+	conn pb.GophkeeperClient
 )
 
 func main() {
-	var serverAddr string
-	flag.StringVar(&serverAddr, "s", "localhost:8080", "Server address")
+	cfg, err := newConfig()
+	if err != nil {
+		flag.Usage()
+		log.Fatal(err)
+	}
 
-	flag.Parse()
+	c, err := newGRPConn(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer c.Close()
+
+	conn = pb.NewGophkeeperClient(c)
 
 	s := newStart()
 	a := newAbout()
+	r := newRegister()
+	l := newLogin()
 
 	m := model{
-		start:  s,
-		about:  a,
-		window: "start",
+		start:    s,
+		about:    a,
+		register: r,
+		login:    l,
+		window:   "start",
 	}
 
-	if _, err := tea.NewProgram(m).Run(); err != nil {
+	if _, err = tea.NewProgram(m).Run(); err != nil {
 		fmt.Println("Error running program:", err)
 		os.Exit(1)
+	}
+}
+
+func newGRPConn(cfg *config) (*grpc.ClientConn, error) {
+	if cfg.TLS {
+		creds, err := credentials.NewClientTLSFromFile("server.crt", "")
+		if err != nil {
+			return nil, fmt.Errorf("failed to load TLS credentials: %w", err)
+		}
+
+		c, err := grpc.NewClient(cfg.Addr, grpc.WithTransportCredentials(creds))
+		if err != nil {
+			return nil, fmt.Errorf("failed to connect: %w", err)
+		}
+
+		return c, nil
+	} else {
+		c, err := grpc.NewClient(cfg.Addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		if err != nil {
+			return nil, fmt.Errorf("failed to connect: %w", err)
+		}
+
+		return c, nil
 	}
 }

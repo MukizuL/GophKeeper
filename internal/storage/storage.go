@@ -11,17 +11,13 @@ import (
 
 //go:generate mockgen -source=storage.go -destination=mocks/storage.go -package=mockstorage
 
-type Repo interface {
+type Repository interface {
 	CreateNewUser(ctx context.Context, login, passwordHash string) error
 	GetUserByID(ctx context.Context, id int) (*models.User, error)
 	GetUserByLogin(ctx context.Context, login string) (*models.User, error)
 }
 
-type Repository struct {
-	r Repo
-}
-
-func newRepository(cfg *config.Config, p *pgstorage.PGStorage) Repo {
+func newRepository(cfg *config.Config, p *pgstorage.PGStorage) Repository {
 	return p
 }
 

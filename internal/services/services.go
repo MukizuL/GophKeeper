@@ -8,12 +8,12 @@ import (
 )
 
 type Services struct {
-	storage    storage.Repo
+	storage    storage.Repository
 	jwtService jwtService.ServiceI
 	logger     *zap.Logger
 }
 
-func newServices(storage storage.Repo, jwtService jwtService.ServiceI, logger *zap.Logger) *Services {
+func newServices(storage storage.Repository, jwtService jwtService.ServiceI, logger *zap.Logger) *Services {
 	return &Services{
 		storage:    storage,
 		jwtService: jwtService,
