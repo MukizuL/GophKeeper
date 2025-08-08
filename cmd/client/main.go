@@ -57,7 +57,7 @@ func main() {
 
 func newGRPConn(cfg *config) (*grpc.ClientConn, error) {
 	if cfg.TLS {
-		creds, err := credentials.NewClientTLSFromFile("server.crt", "")
+		creds, err := credentials.NewClientTLSFromFile(cfg.Cert, "")
 		if err != nil {
 			return nil, fmt.Errorf("failed to load TLS credentials: %w", err)
 		}
