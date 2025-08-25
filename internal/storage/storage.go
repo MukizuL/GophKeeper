@@ -12,9 +12,13 @@ import (
 //go:generate mockgen -source=storage.go -destination=mocks/storage.go -package=mockstorage
 
 type Repository interface {
-	CreateNewUser(ctx context.Context, login, passwordHash string) error
-	GetUserByID(ctx context.Context, id int) (*models.User, error)
+	CreateNewUser(ctx context.Context, login string, passwordHash, salt []byte) error
+	GetUserByID(ctx context.Context, id string) (*models.User, error)
 	GetUserByLogin(ctx context.Context, login string) (*models.User, error)
+
+	CreatePassword(ctx context.Context, userID string, data []byte) error
+
+	GetPasswordsByUserID(ctx context.Context, id string) ([][]byte, error)
 }
 
 func newRepository(cfg *config.Config, p *pgstorage.PGStorage) Repository {

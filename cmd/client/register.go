@@ -25,6 +25,7 @@ func newRegister() register {
 		t = textinput.New()
 		t.Cursor.Style = selectedItemStyle
 		t.CharLimit = 32
+		t.Width = 20
 
 		switch i {
 		case 0:
@@ -100,20 +101,7 @@ func updateRegister(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 				m.register.focusIndex = len(m.register.inputs) + 1
 			}
 
-			cmds := make([]tea.Cmd, len(m.register.inputs))
-			for i := 0; i < len(m.register.inputs); i++ {
-				if i == m.register.focusIndex {
-					// Set focused state
-					cmds[i] = m.register.inputs[i].Focus()
-					m.register.inputs[i].PromptStyle = formSelectedStyle
-					m.register.inputs[i].TextStyle = formSelectedStyle
-					continue
-				}
-				// Remove focused state
-				m.register.inputs[i].Blur()
-				m.register.inputs[i].PromptStyle = formStyle
-				m.register.inputs[i].TextStyle = formStyle
-			}
+			cmds := focusOrBlur(m.register.inputs, m.register.focusIndex)
 
 			return m, tea.Batch(cmds...)
 		}

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -50,15 +51,15 @@ func Register(login, password string) error {
 	return nil
 }
 
-func Login(login, password string) (string, error) {
+func Login(login, password string) (string, []byte, error) {
 	err := validateLogin(login)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
 	err = validatePassword(password)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
 	req := pb.AuthRequest{
@@ -75,21 +76,104 @@ func Login(login, password string) (string, error) {
 		if e, ok := status.FromError(err); ok {
 			switch e.Code() {
 			case codes.DeadlineExceeded:
-				return "", fmt.Errorf("server took to long to respond: %s", e.Message())
+				return "", nil, fmt.Errorf("server took to long to respond: %s", e.Message())
 			case codes.Unauthenticated:
-				return "", fmt.Errorf("%s", e.Message())
+				return "", nil, fmt.Errorf("%s", e.Message())
 			case codes.Internal:
-				return "", fmt.Errorf("server error: %s", e.Message())
+				return "", nil, fmt.Errorf("server error: %s", e.Message())
 			default:
-				return "", fmt.Errorf("unknown error: %s", e.Message())
+				return "", nil, fmt.Errorf("unknown error: %s", e.Message())
 			}
 		}
 	}
 
 	tokens := header.Get("access-token")
 	if len(tokens) == 0 {
-		return "", fmt.Errorf("access token is missing")
+		return "", nil, fmt.Errorf("access token is missing")
 	}
 
-	return tokens[0], nil
+	dks := header.Get("dk-bin")
+	if len(tokens) == 0 {
+		return "", nil, fmt.Errorf("derived key is missing")
+	}
+
+	return tokens[0], []byte(dks[0]), nil
+}
+
+func CreatePassword(token string, dk []byte, name, login, password, description string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	md := metadata.Pairs("access-token", token)
+	ctxOut := metadata.NewOutgoingContext(ctx, md)
+
+	data, err := json.Marshal(map[string]string{"name": name, "login": login, "password": password, "description": description})
+	if err != nil {
+		return err
+	}
+
+	encrypted, err := encrypt(dk, data)
+	if err != nil {
+		return err
+	}
+
+	req := pb.CreatePasswordRequest{
+		Data: encrypted,
+	}
+
+	_, err = conn.CreatePassword(ctxOut, &req)
+	if err != nil {
+		if e, ok := status.FromError(err); ok {
+			switch e.Code() {
+			case codes.DeadlineExceeded:
+				return fmt.Errorf("server took to long to respond: %s", e.Message())
+			case codes.Unauthenticated:
+				return fmt.Errorf("%s", e.Message())
+			case codes.Internal:
+				return fmt.Errorf("server error: %s", e.Message())
+			default:
+				return fmt.Errorf("unknown error: %s", e.Message())
+			}
+		}
+	}
+
+	return nil
+}
+
+func GetPasswords(token string, dk []byte) ([][]byte, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	md := metadata.Pairs("access-token", token)
+	ctxOut := metadata.NewOutgoingContext(ctx, md)
+
+	req := pb.GetPasswordsRequest{}
+
+	data, err := conn.GetPasswords(ctxOut, &req)
+	if err != nil {
+		if e, ok := status.FromError(err); ok {
+			switch e.Code() {
+			case codes.DeadlineExceeded:
+				return nil, fmt.Errorf("server took to long to respond: %s", e.Message())
+			case codes.Unauthenticated:
+				return nil, fmt.Errorf("%s", e.Message())
+			case codes.Internal:
+				return nil, fmt.Errorf("server error: %s", e.Message())
+			default:
+				return nil, fmt.Errorf("unknown error: %s", e.Message())
+			}
+		}
+	}
+
+	var passwords [][]byte
+	for _, v := range data.Data {
+		decrypted, err := decrypt(dk, v)
+		if err != nil {
+			return nil, err
+		}
+
+		passwords = append(passwords, decrypted)
+	}
+
+	return passwords, nil
 }

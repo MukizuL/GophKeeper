@@ -28,25 +28,41 @@ func main() {
 		log.Fatal(err)
 	}
 
-	c, err := newGRPConn(cfg)
+	cgrpc, err := newGRPConn(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer c.Close()
+	defer cgrpc.Close()
 
-	conn = pb.NewGophkeeperClient(c)
+	conn = pb.NewGophkeeperClient(cgrpc)
+
+	// TODO: Check if server is available
 
 	s := newStart()
 	a := newAbout()
 	r := newRegister()
 	l := newLogin()
+	h := newHome()
+	c := newCreate()
+	cpass := newCreatePassword()
+	cbank := newCreateBank()
+	ctext := newCreateText()
+	cdata := newCreateData()
+	store := newStorage()
 
 	m := model{
-		start:    s,
-		about:    a,
-		register: r,
-		login:    l,
-		window:   "start",
+		start:          s,
+		about:          a,
+		register:       r,
+		login:          l,
+		home:           h,
+		create:         c,
+		createPassword: cpass,
+		createBank:     cbank,
+		createText:     ctext,
+		createData:     cdata,
+		storage:        store,
+		window:         "start",
 	}
 
 	if _, err = tea.NewProgram(m).Run(); err != nil {

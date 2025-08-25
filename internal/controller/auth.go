@@ -44,7 +44,7 @@ func (c Controller) Register(ctx context.Context, in *pb.RegisterRequest) (*pb.R
 }
 
 func (c Controller) Authorize(ctx context.Context, in *pb.AuthRequest) (*pb.AuthResponse, error) {
-	token, err := c.services.Login(ctx, in.Login, in.Password)
+	token, dk, err := c.services.Login(ctx, in.Login, in.Password)
 	if err != nil {
 		switch {
 		case errors.Is(err, errs.ErrNotAuthorized):
@@ -59,6 +59,8 @@ func (c Controller) Authorize(ctx context.Context, in *pb.AuthRequest) (*pb.Auth
 	}
 
 	header := metadata.Pairs("access-token", token)
+	header.Append("dk-bin", string(dk))
+
 	err = grpc.SetHeader(ctx, header)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())

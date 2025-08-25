@@ -15,7 +15,7 @@ type PGStorage struct {
 }
 
 func newPGStorage(cfg *config.Config, logger *zap.Logger) *PGStorage {
-	dbpool, err := pgxpool.New(context.TODO(), cfg.DSN)
+	dbpool, err := pgxpool.New(context.Background(), cfg.DSN)
 	if err != nil {
 		panic(err)
 	}

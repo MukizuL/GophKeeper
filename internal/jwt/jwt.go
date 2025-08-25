@@ -13,6 +13,7 @@ import (
 //go:generate mockgen -source=jwt.go -destination=mocks/jwt.go -package=mockjwt
 
 type ServiceI interface {
+	// ValidateToken returns parsed userID and an error
 	ValidateToken(token string) (string, error)
 	CreateToken(userID string) (string, error)
 }
