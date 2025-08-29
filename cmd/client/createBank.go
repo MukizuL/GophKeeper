@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -154,8 +155,21 @@ func updateCreateBank(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 					m.createBank.error = err
 					return m, nil
 				}
+				if m.createBank.inputs[2].Value() == "" {
+					m.createBank.error = errors.New("name cannot be empty")
+				}
 				m.createBank.error = nil
-				// TODO: GRPC request to create bank card. Should error if it is a duplicate number.
+				// TODO: Should error if it is a duplicate number.
+				err = CreateBank(m.token, m.dk,
+					m.createBank.inputs[0].Value(),
+					m.createBank.inputs[1].Value(),
+					m.createBank.inputs[2].Value(),
+					m.createBank.inputs[3].Value(),
+				)
+				if err != nil {
+					m.createBank.error = err
+					return m, nil
+				}
 
 				m.window = "home"
 				m.createBank.success = true

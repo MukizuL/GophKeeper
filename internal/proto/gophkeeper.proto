@@ -70,6 +70,24 @@ message GetPasswordsResponse {
   repeated bytes data = 1;
 }
 
+// Get Bank
+message GetBankRequest {
+
+}
+
+message GetBankResponse {
+  repeated bytes data = 1;
+}
+
+// Get Text
+message GetTextRequest {
+
+}
+
+message GetTextResponse {
+  repeated bytes data = 1;
+}
+
 service gophkeeper {
   rpc Register(RegisterRequest) returns (RegisterResponse);
   rpc Authorize(AuthRequest) returns (AuthResponse);
@@ -78,4 +96,6 @@ service gophkeeper {
   rpc CreateText(CreateTextRequest) returns (CreateTextResponse);
   rpc CreateData(stream CreateDataRequest) returns (CreateDataResponse);
   rpc GetPasswords(GetPasswordsRequest) returns (GetPasswordsResponse);
+  rpc GetBank(GetBankRequest) returns (GetBankResponse);
+  rpc GetText(GetTextRequest) returns (GetTextResponse);
 }

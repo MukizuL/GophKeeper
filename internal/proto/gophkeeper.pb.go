@@ -612,6 +612,168 @@ func (x *GetPasswordsResponse) GetData() [][]byte {
 	return nil
 }
 
+// Get Bank
+type GetBankRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBankRequest) Reset() {
+	*x = GetBankRequest{}
+	mi := &file_internal_proto_gophkeeper_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBankRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBankRequest) ProtoMessage() {}
+
+func (x *GetBankRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_gophkeeper_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBankRequest.ProtoReflect.Descriptor instead.
+func (*GetBankRequest) Descriptor() ([]byte, []int) {
+	return file_internal_proto_gophkeeper_proto_rawDescGZIP(), []int{14}
+}
+
+type GetBankResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Data          [][]byte               `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBankResponse) Reset() {
+	*x = GetBankResponse{}
+	mi := &file_internal_proto_gophkeeper_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBankResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBankResponse) ProtoMessage() {}
+
+func (x *GetBankResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_gophkeeper_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBankResponse.ProtoReflect.Descriptor instead.
+func (*GetBankResponse) Descriptor() ([]byte, []int) {
+	return file_internal_proto_gophkeeper_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *GetBankResponse) GetData() [][]byte {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// Get Text
+type GetTextRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetTextRequest) Reset() {
+	*x = GetTextRequest{}
+	mi := &file_internal_proto_gophkeeper_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetTextRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTextRequest) ProtoMessage() {}
+
+func (x *GetTextRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_gophkeeper_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTextRequest.ProtoReflect.Descriptor instead.
+func (*GetTextRequest) Descriptor() ([]byte, []int) {
+	return file_internal_proto_gophkeeper_proto_rawDescGZIP(), []int{16}
+}
+
+type GetTextResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Data          [][]byte               `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetTextResponse) Reset() {
+	*x = GetTextResponse{}
+	mi := &file_internal_proto_gophkeeper_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetTextResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTextResponse) ProtoMessage() {}
+
+func (x *GetTextResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_gophkeeper_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTextResponse.ProtoReflect.Descriptor instead.
+func (*GetTextResponse) Descriptor() ([]byte, []int) {
+	return file_internal_proto_gophkeeper_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *GetTextResponse) GetData() [][]byte {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
 var File_internal_proto_gophkeeper_proto protoreflect.FileDescriptor
 
 const file_internal_proto_gophkeeper_proto_rawDesc = "" +
@@ -641,7 +803,13 @@ const file_internal_proto_gophkeeper_proto_rawDesc = "" +
 	"\x12CreateDataResponse\"\x15\n" +
 	"\x13GetPasswordsRequest\"*\n" +
 	"\x14GetPasswordsResponse\x12\x12\n" +
-	"\x04data\x18\x01 \x03(\fR\x04data2\xa8\x04\n" +
+	"\x04data\x18\x01 \x03(\fR\x04data\"\x10\n" +
+	"\x0eGetBankRequest\"%\n" +
+	"\x0fGetBankResponse\x12\x12\n" +
+	"\x04data\x18\x01 \x03(\fR\x04data\"\x10\n" +
+	"\x0eGetTextRequest\"%\n" +
+	"\x0fGetTextResponse\x12\x12\n" +
+	"\x04data\x18\x01 \x03(\fR\x04data2\xb0\x05\n" +
 	"\n" +
 	"gophkeeper\x12E\n" +
 	"\bRegister\x12\x1b.gophkeeper.RegisterRequest\x1a\x1c.gophkeeper.RegisterResponse\x12>\n" +
@@ -653,7 +821,9 @@ const file_internal_proto_gophkeeper_proto_rawDesc = "" +
 	"CreateText\x12\x1d.gophkeeper.CreateTextRequest\x1a\x1e.gophkeeper.CreateTextResponse\x12M\n" +
 	"\n" +
 	"CreateData\x12\x1d.gophkeeper.CreateDataRequest\x1a\x1e.gophkeeper.CreateDataResponse(\x01\x12Q\n" +
-	"\fGetPasswords\x12\x1f.gophkeeper.GetPasswordsRequest\x1a .gophkeeper.GetPasswordsResponseB%Z#github.com/MukizuL/GophKeeper/protob\x06proto3"
+	"\fGetPasswords\x12\x1f.gophkeeper.GetPasswordsRequest\x1a .gophkeeper.GetPasswordsResponse\x12B\n" +
+	"\aGetBank\x12\x1a.gophkeeper.GetBankRequest\x1a\x1b.gophkeeper.GetBankResponse\x12B\n" +
+	"\aGetText\x12\x1a.gophkeeper.GetTextRequest\x1a\x1b.gophkeeper.GetTextResponseB%Z#github.com/MukizuL/GophKeeper/protob\x06proto3"
 
 var (
 	file_internal_proto_gophkeeper_proto_rawDescOnce sync.Once
@@ -667,7 +837,7 @@ func file_internal_proto_gophkeeper_proto_rawDescGZIP() []byte {
 	return file_internal_proto_gophkeeper_proto_rawDescData
 }
 
-var file_internal_proto_gophkeeper_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_internal_proto_gophkeeper_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
 var file_internal_proto_gophkeeper_proto_goTypes = []any{
 	(*RegisterRequest)(nil),        // 0: gophkeeper.RegisterRequest
 	(*RegisterResponse)(nil),       // 1: gophkeeper.RegisterResponse
@@ -683,6 +853,10 @@ var file_internal_proto_gophkeeper_proto_goTypes = []any{
 	(*CreateDataResponse)(nil),     // 11: gophkeeper.CreateDataResponse
 	(*GetPasswordsRequest)(nil),    // 12: gophkeeper.GetPasswordsRequest
 	(*GetPasswordsResponse)(nil),   // 13: gophkeeper.GetPasswordsResponse
+	(*GetBankRequest)(nil),         // 14: gophkeeper.GetBankRequest
+	(*GetBankResponse)(nil),        // 15: gophkeeper.GetBankResponse
+	(*GetTextRequest)(nil),         // 16: gophkeeper.GetTextRequest
+	(*GetTextResponse)(nil),        // 17: gophkeeper.GetTextResponse
 }
 var file_internal_proto_gophkeeper_proto_depIdxs = []int32{
 	0,  // 0: gophkeeper.gophkeeper.Register:input_type -> gophkeeper.RegisterRequest
@@ -692,15 +866,19 @@ var file_internal_proto_gophkeeper_proto_depIdxs = []int32{
 	8,  // 4: gophkeeper.gophkeeper.CreateText:input_type -> gophkeeper.CreateTextRequest
 	10, // 5: gophkeeper.gophkeeper.CreateData:input_type -> gophkeeper.CreateDataRequest
 	12, // 6: gophkeeper.gophkeeper.GetPasswords:input_type -> gophkeeper.GetPasswordsRequest
-	1,  // 7: gophkeeper.gophkeeper.Register:output_type -> gophkeeper.RegisterResponse
-	3,  // 8: gophkeeper.gophkeeper.Authorize:output_type -> gophkeeper.AuthResponse
-	5,  // 9: gophkeeper.gophkeeper.CreatePassword:output_type -> gophkeeper.CreatePasswordResponse
-	7,  // 10: gophkeeper.gophkeeper.CreateBank:output_type -> gophkeeper.CreateBankResponse
-	9,  // 11: gophkeeper.gophkeeper.CreateText:output_type -> gophkeeper.CreateTextResponse
-	11, // 12: gophkeeper.gophkeeper.CreateData:output_type -> gophkeeper.CreateDataResponse
-	13, // 13: gophkeeper.gophkeeper.GetPasswords:output_type -> gophkeeper.GetPasswordsResponse
-	7,  // [7:14] is the sub-list for method output_type
-	0,  // [0:7] is the sub-list for method input_type
+	14, // 7: gophkeeper.gophkeeper.GetBank:input_type -> gophkeeper.GetBankRequest
+	16, // 8: gophkeeper.gophkeeper.GetText:input_type -> gophkeeper.GetTextRequest
+	1,  // 9: gophkeeper.gophkeeper.Register:output_type -> gophkeeper.RegisterResponse
+	3,  // 10: gophkeeper.gophkeeper.Authorize:output_type -> gophkeeper.AuthResponse
+	5,  // 11: gophkeeper.gophkeeper.CreatePassword:output_type -> gophkeeper.CreatePasswordResponse
+	7,  // 12: gophkeeper.gophkeeper.CreateBank:output_type -> gophkeeper.CreateBankResponse
+	9,  // 13: gophkeeper.gophkeeper.CreateText:output_type -> gophkeeper.CreateTextResponse
+	11, // 14: gophkeeper.gophkeeper.CreateData:output_type -> gophkeeper.CreateDataResponse
+	13, // 15: gophkeeper.gophkeeper.GetPasswords:output_type -> gophkeeper.GetPasswordsResponse
+	15, // 16: gophkeeper.gophkeeper.GetBank:output_type -> gophkeeper.GetBankResponse
+	17, // 17: gophkeeper.gophkeeper.GetText:output_type -> gophkeeper.GetTextResponse
+	9,  // [9:18] is the sub-list for method output_type
+	0,  // [0:9] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name
@@ -717,7 +895,7 @@ func file_internal_proto_gophkeeper_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_proto_gophkeeper_proto_rawDesc), len(file_internal_proto_gophkeeper_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   14,
+			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

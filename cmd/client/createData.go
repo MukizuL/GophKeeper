@@ -5,8 +5,13 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/bubbles/filepicker"
+	"github.com/charmbracelet/bubbles/progress"
 	tea "github.com/charmbracelet/bubbletea"
 )
+
+type uploadProgressMsg float64
+
+type errMsg struct{ error }
 
 type createData struct {
 	fp           filepicker.Model
@@ -14,6 +19,9 @@ type createData struct {
 	once         bool
 	success      bool
 	error        error
+	progress     progress.Model
+	uploading    bool
+	percent      float64
 }
 
 func newCreateData() createData {
@@ -23,20 +31,39 @@ func newCreateData() createData {
 	fp.AutoHeight = false
 	fp.SetHeight(10)
 
+	p := progress.New(progress.WithDefaultGradient())
+
 	return createData{
-		fp: fp,
+		fp:       fp,
+		progress: p,
 	}
 }
 
 func updateCreateData(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case uploadProgressMsg:
+		m.createData.percent = float64(msg)
+		if m.createData.percent >= 1.0 {
+			m.createData.success = true
+			m.createData.uploading = false
+			m.window = "home"
+		}
+		return m, nil
+
+	case errMsg:
+		m.createData.error = msg.error
+		m.createData.uploading = false
+		return m, nil
+	}
+
 	var cmd tea.Cmd
 	m.createData.fp, cmd = m.createData.fp.Update(msg)
 
-	// Did the user select a file?
 	if didSelect, path := m.createData.fp.DidSelectFile(msg); didSelect {
-		// Get the path of the selected file.
 		m.createData.selectedFile = path
-		// TODO: GRPC request to upload a file.
+		m.createData.uploading = true
+
+		return m, CreateData(m.token, m.dk, m.createData.selectedFile, &m.createData.percent)
 	}
 
 	return m, cmd
@@ -50,6 +77,15 @@ func viewCreateData(m model) string {
 		b.WriteString("\n\n")
 	} else {
 		b.WriteString("\n")
+	}
+
+	if m.createData.uploading {
+		b.WriteString("Uploading:")
+		b.WriteString("\n")
+		b.WriteString(m.createData.progress.ViewAs(m.createData.percent))
+		b.WriteString("\n")
+
+		return b.String()
 	}
 
 	if m.createData.selectedFile != "" {

@@ -6,6 +6,8 @@ import (
 
 	"github.com/MukizuL/GophKeeper/internal/errs"
 	"github.com/MukizuL/GophKeeper/internal/helpers"
+	pb "github.com/MukizuL/GophKeeper/internal/proto"
+	"github.com/google/uuid"
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -84,7 +86,69 @@ func (s Services) CreatePassword(ctx context.Context, token string, data []byte)
 
 	err = s.storage.CreatePassword(ctx, userID, data)
 	if err != nil {
-		s.logger.Error("failed to create a new password", zap.String("token", token), zap.Error(err))
+		s.logger.Error("failed to create a new password", zap.String("userID", userID), zap.Error(err))
+		return errs.ErrInternalServerError
+	}
+
+	return nil
+}
+
+func (s Services) CreateBank(ctx context.Context, token string, data []byte) error {
+	userID, err := s.jwtService.ValidateToken(token)
+	if err != nil {
+		s.logger.Error("failed to validate token", zap.String("token", token), zap.Error(err))
+		return err
+	}
+
+	err = s.storage.CreateBank(ctx, userID, data)
+	if err != nil {
+		s.logger.Error("failed to create a new bank card", zap.String("userID", userID), zap.Error(err))
+		return errs.ErrInternalServerError
+	}
+
+	return nil
+}
+
+func (s Services) CreateTextual(ctx context.Context, token string, data []byte) error {
+	userID, err := s.jwtService.ValidateToken(token)
+	if err != nil {
+		s.logger.Error("failed to validate token", zap.String("token", token), zap.Error(err))
+		return err
+	}
+
+	err = s.storage.CreateTextual(ctx, userID, data)
+	if err != nil {
+		s.logger.Error("failed to create a new text", zap.String("userID", userID), zap.Error(err))
+		return errs.ErrInternalServerError
+	}
+
+	return nil
+}
+
+func (s Services) CreateData(ctx context.Context, token string, stream pb.Gophkeeper_CreateDataServer) error {
+	userID, err := s.jwtService.ValidateToken(token)
+	if err != nil {
+		s.logger.Error("failed to validate token", zap.String("token", token), zap.Error(err))
+		return err
+	}
+
+	id := uuid.New()
+
+	filename, err := s.storage.CreateData(ctx, id.String(), stream)
+	if err != nil {
+		s.logger.Error("failed to create a new data",
+			zap.String("id", id.String()),
+			zap.String("userID", userID),
+			zap.Error(err))
+		return errs.ErrInternalServerError
+	}
+
+	err = s.storage.CreateReference(ctx, userID, id.String(), filename)
+	if err != nil {
+		s.logger.Error("failed to create a new data reference",
+			zap.String("id", id.String()),
+			zap.String("userID", userID),
+			zap.Error(err))
 		return errs.ErrInternalServerError
 	}
 

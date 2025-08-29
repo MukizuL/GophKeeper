@@ -16,7 +16,7 @@ const (
 )
 
 var (
-	pink              = lipgloss.NewStyle().Foreground(lipgloss.Color("170"))
+	//pink              = lipgloss.NewStyle().Foreground(lipgloss.Color("170"))
 	listTitleStyle    = lipgloss.NewStyle().MarginLeft(2)
 	itemStyle         = lipgloss.NewStyle().PaddingLeft(4)
 	selectedItemStyle = lipgloss.NewStyle().PaddingLeft(2).Foreground(lipgloss.Color("170"))
@@ -82,7 +82,9 @@ type model struct {
 	createData       createData
 	storage          storage
 	storagePasswords storagePasswords
+	storageBank      storageBank
 	viewPassword     viewPassword
+	viewBank         viewBank
 	window           string
 }
 
@@ -123,8 +125,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return updateStorage(msg, m)
 	case "storage-password":
 		return updateStoragePasswords(msg, m)
+	case "storage-bank":
+		return updateStorageBank(msg, m)
 	case "view-password":
 		return updateViewPassword(msg, m)
+	case "view-bank":
+		return updateViewBank(msg, m)
 	default:
 		return m, nil
 	}
@@ -156,8 +162,12 @@ func (m model) View() string {
 		return viewStorage(m)
 	case "storage-password":
 		return viewStoragePasswords(m)
+	case "storage-bank":
+		return viewStorageBank(m)
 	case "view-password":
 		return viewViewPassword(m)
+	case "view-bank":
+		return viewViewBank(m)
 	default:
 		return "Unknown window."
 	}

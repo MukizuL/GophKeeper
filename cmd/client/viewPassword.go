@@ -31,16 +31,17 @@ func viewViewPassword(m model) string {
 	var b strings.Builder
 
 	b.WriteString("\n")
+	b.WriteString(itemStyle.Render("Name: "))
 	b.WriteString(itemStyle.Render(m.viewPassword.password.Name))
 	b.WriteString("\n")
+	b.WriteString(itemStyle.Render("Login: "))
 	b.WriteString(itemStyle.Render(m.viewPassword.password.Login))
-	b.WriteString(buildVersion)
 	b.WriteString("\n")
+	b.WriteString(itemStyle.Render("Password: "))
 	b.WriteString(itemStyle.Render(m.viewPassword.password.Password))
-	b.WriteString(buildCommit)
 	b.WriteString("\n")
+	b.WriteString(itemStyle.Render("Description: "))
 	b.WriteString(itemStyle.Render(m.viewPassword.password.Description))
-	b.WriteString(buildDate)
 	b.WriteString("\n")
 
 	button := &backButtonFocused

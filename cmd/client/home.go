@@ -64,7 +64,7 @@ func updateHome(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 func viewHome(m model) string {
 	var b strings.Builder
 
-	if m.createPassword.success || m.createBank.success || m.createText.success {
+	if m.createPassword.success || m.createBank.success || m.createText.success || m.createData.success {
 		b.WriteString(successStyle.Render("Entry created"))
 	}
 	b.WriteString("\n")

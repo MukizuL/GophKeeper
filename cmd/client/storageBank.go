@@ -8,39 +8,39 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type storagePasswords struct {
-	list      list.Model
-	passwords map[string]password
-	err       error
+type storageBank struct {
+	list  list.Model
+	cards map[string]card
+	err   error
 }
 
-type password struct {
-	Name        string `json:"name"`
-	Login       string `json:"login"`
-	Password    string `json:"password"`
-	Description string `json:"description"`
+type card struct {
+	Name string `json:"name"`
+	CCN  string `json:"ccn"`
+	EXP  string `json:"exp"`
+	CVV  string `json:"cvv"`
 }
 
-func newStoragePasswords(m model) storagePasswords {
+func newStorageBank(m model) storageBank {
 	var items []list.Item
 
-	data, err := GetPasswords(m.token, m.dk)
+	data, err := GetBank(m.token, m.dk)
 	if err != nil {
-		return storagePasswords{err: err}
+		return storageBank{err: err}
 	}
 
-	out := storagePasswords{
-		passwords: make(map[string]password, len(data)),
+	out := storageBank{
+		cards: make(map[string]card, len(data)),
 	}
 
 	for _, v := range data {
-		var temp password
+		var temp card
 		err = json.Unmarshal(v, &temp)
 		if err != nil {
-			return storagePasswords{err: err}
+			return storageBank{err: err}
 		}
 
-		out.passwords[temp.Name] = temp
+		out.cards[temp.Name] = temp
 
 		items = append(items, item(temp.Name))
 	}
@@ -48,7 +48,7 @@ func newStoragePasswords(m model) storagePasswords {
 	items = append(items, item("Back"))
 
 	l := list.New(items, itemDelegate{}, defaultWidth, listHeight)
-	l.Title = "Passwords"
+	l.Title = "Cards"
 	l.SetShowStatusBar(false)
 	l.SetFilteringEnabled(false)
 	l.Styles.Title = listTitleStyle
@@ -60,44 +60,44 @@ func newStoragePasswords(m model) storagePasswords {
 	return out
 }
 
-func updateStoragePasswords(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
+func updateStorageBank(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 	var cmds []tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		m.storagePasswords.list.SetWidth(msg.Width)
+		m.storageBank.list.SetWidth(msg.Width)
 		return m, nil
 
 	case tea.KeyMsg:
 		switch keypress := msg.String(); keypress {
 		case "enter":
-			i, ok := m.storagePasswords.list.SelectedItem().(item)
+			i, ok := m.storageBank.list.SelectedItem().(item)
 			if ok {
 				switch i {
 				case "Back":
 					m.window = "storage"
 				default:
-					m.window = "view-password"
-					m.viewPassword = newViewPassword(m.storagePasswords.passwords[string(i)])
+					m.window = "view-bank"
+					m.viewBank = newViewBank(m.storageBank.cards[string(i)])
 				}
 			}
 		}
 	}
 
 	var cmd tea.Cmd
-	m.storagePasswords.list, cmd = m.storagePasswords.list.Update(msg)
+	m.storageBank.list, cmd = m.storageBank.list.Update(msg)
 	cmds = append(cmds, cmd)
 
 	return m, tea.Batch(cmds...)
 }
 
-func viewStoragePasswords(m model) string {
+func viewStorageBank(m model) string {
 	var b strings.Builder
 
 	b.WriteString("\n")
-	if m.storagePasswords.err != nil {
+	if m.storageBank.err != nil {
 		b.WriteString("An error occurred. Try again")
 	} else {
-		b.WriteString(m.storagePasswords.list.View())
+		b.WriteString(m.storageBank.list.View())
 	}
 
 	return b.String()

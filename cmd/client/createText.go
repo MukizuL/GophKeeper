@@ -60,7 +60,15 @@ func updateCreateText(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 					return m, nil
 				}
 				m.createText.error = nil
-				// TODO: GRPC request to create text. Each name should be unique and not empty.
+				// TODO: Each name should be unique and not empty.
+				err := CreateTextual(m.token, m.dk,
+					m.createText.name.Value(),
+					m.createText.text.Value(),
+				)
+				if err != nil {
+					m.createText.error = err
+					return m, nil
+				}
 
 				m.window = "home"
 				m.createText.success = true
