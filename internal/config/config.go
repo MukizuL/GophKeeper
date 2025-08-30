@@ -68,6 +68,7 @@ func newConfig() (*Config, error) {
 	return resultCfg, nil
 }
 
+// checkParams verifies fields to be correct.
 func checkParams(cfg *Config) error {
 	if cfg.GRPCPort != "" {
 		port, err := strconv.Atoi(strings.TrimPrefix(cfg.GRPCPort, ":"))
@@ -132,11 +133,6 @@ func checkFiles(cert, pk string) error {
 
 	return nil
 }
-
-//func setSwagger(cfg *Config) {
-//	docs.SwaggerInfo.Host = cfg.Addr
-//	docs.SwaggerInfo.BasePath = cfg.Base
-//}
 
 // envConfig populates Config from environment
 func envConfig() (*Config, error) {

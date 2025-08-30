@@ -47,8 +47,6 @@ func (c Controller) Authorize(ctx context.Context, in *pb.AuthRequest) (*pb.Auth
 	token, dk, err := c.services.Login(ctx, in.Login, in.Password)
 	if err != nil {
 		switch {
-		case errors.Is(err, errs.ErrNotAuthorized):
-			return nil, status.Error(codes.Unauthenticated, err.Error())
 		case errors.Is(err, errs.ErrWrongCredentials):
 			return nil, status.Error(codes.Unauthenticated, err.Error())
 		case errors.Is(err, errs.ErrSigningToken):
