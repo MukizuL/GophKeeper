@@ -12,12 +12,7 @@ import (
 )
 
 func (c Controller) CreatePassword(ctx context.Context, in *pb.CreatePasswordRequest) (*pb.CreatePasswordResponse, error) {
-	token, err := helpers.GetToken(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Unauthenticated, err.Error())
-	}
-
-	err = c.services.CreatePassword(ctx, token, in.Data)
+	err := c.services.CreatePassword(ctx, in.Data)
 	if err != nil {
 		switch {
 		case errors.Is(err, errs.ErrNotAuthorized):
@@ -31,12 +26,7 @@ func (c Controller) CreatePassword(ctx context.Context, in *pb.CreatePasswordReq
 }
 
 func (c Controller) CreateBank(ctx context.Context, in *pb.CreateBankRequest) (*pb.CreateBankResponse, error) {
-	token, err := helpers.GetToken(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Unauthenticated, err.Error())
-	}
-
-	err = c.services.CreateBank(ctx, token, in.Data)
+	err := c.services.CreateBank(ctx, in.Data)
 	if err != nil {
 		switch {
 		case errors.Is(err, errs.ErrNotAuthorized):
@@ -49,13 +39,8 @@ func (c Controller) CreateBank(ctx context.Context, in *pb.CreateBankRequest) (*
 	return &pb.CreateBankResponse{}, nil
 }
 
-func (c Controller) CreateTextual(ctx context.Context, in *pb.CreateTextRequest) (*pb.CreateTextResponse, error) {
-	token, err := helpers.GetToken(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Unauthenticated, err.Error())
-	}
-
-	err = c.services.CreateTextual(ctx, token, in.Data)
+func (c Controller) CreateText(ctx context.Context, in *pb.CreateTextRequest) (*pb.CreateTextResponse, error) {
+	err := c.services.CreateTextual(ctx, in.Data)
 	if err != nil {
 		switch {
 		case errors.Is(err, errs.ErrNotAuthorized):

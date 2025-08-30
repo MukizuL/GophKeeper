@@ -159,7 +159,7 @@ func updateCreateBank(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 					m.createBank.error = errors.New("name cannot be empty")
 				}
 				m.createBank.error = nil
-				// TODO: Should error if it is a duplicate number.
+
 				err = CreateBank(m.token, m.dk,
 					m.createBank.inputs[0].Value(),
 					m.createBank.inputs[1].Value(),

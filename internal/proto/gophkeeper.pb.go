@@ -445,7 +445,7 @@ func (*CreateTextResponse) Descriptor() ([]byte, []int) {
 // Create Data
 type CreateDataRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Filename      string                 `protobuf:"bytes,1,opt,name=filename,proto3" json:"filename,omitempty"`
+	Filename      []byte                 `protobuf:"bytes,1,opt,name=filename,proto3" json:"filename,omitempty"`
 	Chunk         []byte                 `protobuf:"bytes,2,opt,name=chunk,proto3" json:"chunk,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -481,11 +481,11 @@ func (*CreateDataRequest) Descriptor() ([]byte, []int) {
 	return file_internal_proto_gophkeeper_proto_rawDescGZIP(), []int{10}
 }
 
-func (x *CreateDataRequest) GetFilename() string {
+func (x *CreateDataRequest) GetFilename() []byte {
 	if x != nil {
 		return x.Filename
 	}
-	return ""
+	return nil
 }
 
 func (x *CreateDataRequest) GetChunk() []byte {
@@ -774,6 +774,228 @@ func (x *GetTextResponse) GetData() [][]byte {
 	return nil
 }
 
+// Get Data
+type File struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Filename      []byte                 `protobuf:"bytes,2,opt,name=filename,proto3" json:"filename,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *File) Reset() {
+	*x = File{}
+	mi := &file_internal_proto_gophkeeper_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *File) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*File) ProtoMessage() {}
+
+func (x *File) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_gophkeeper_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use File.ProtoReflect.Descriptor instead.
+func (*File) Descriptor() ([]byte, []int) {
+	return file_internal_proto_gophkeeper_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *File) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *File) GetFilename() []byte {
+	if x != nil {
+		return x.Filename
+	}
+	return nil
+}
+
+type GetDataRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDataRequest) Reset() {
+	*x = GetDataRequest{}
+	mi := &file_internal_proto_gophkeeper_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDataRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDataRequest) ProtoMessage() {}
+
+func (x *GetDataRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_gophkeeper_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDataRequest.ProtoReflect.Descriptor instead.
+func (*GetDataRequest) Descriptor() ([]byte, []int) {
+	return file_internal_proto_gophkeeper_proto_rawDescGZIP(), []int{19}
+}
+
+type GetDataResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	File          []*File                `protobuf:"bytes,1,rep,name=file,proto3" json:"file,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDataResponse) Reset() {
+	*x = GetDataResponse{}
+	mi := &file_internal_proto_gophkeeper_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDataResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDataResponse) ProtoMessage() {}
+
+func (x *GetDataResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_gophkeeper_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDataResponse.ProtoReflect.Descriptor instead.
+func (*GetDataResponse) Descriptor() ([]byte, []int) {
+	return file_internal_proto_gophkeeper_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *GetDataResponse) GetFile() []*File {
+	if x != nil {
+		return x.File
+	}
+	return nil
+}
+
+// Download file
+type DownloadRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DownloadRequest) Reset() {
+	*x = DownloadRequest{}
+	mi := &file_internal_proto_gophkeeper_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DownloadRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DownloadRequest) ProtoMessage() {}
+
+func (x *DownloadRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_gophkeeper_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DownloadRequest.ProtoReflect.Descriptor instead.
+func (*DownloadRequest) Descriptor() ([]byte, []int) {
+	return file_internal_proto_gophkeeper_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *DownloadRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type DownloadResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Chunk         []byte                 `protobuf:"bytes,2,opt,name=chunk,proto3" json:"chunk,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DownloadResponse) Reset() {
+	*x = DownloadResponse{}
+	mi := &file_internal_proto_gophkeeper_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DownloadResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DownloadResponse) ProtoMessage() {}
+
+func (x *DownloadResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_proto_gophkeeper_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DownloadResponse.ProtoReflect.Descriptor instead.
+func (*DownloadResponse) Descriptor() ([]byte, []int) {
+	return file_internal_proto_gophkeeper_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *DownloadResponse) GetChunk() []byte {
+	if x != nil {
+		return x.Chunk
+	}
+	return nil
+}
+
 var File_internal_proto_gophkeeper_proto protoreflect.FileDescriptor
 
 const file_internal_proto_gophkeeper_proto_rawDesc = "" +
@@ -798,7 +1020,7 @@ const file_internal_proto_gophkeeper_proto_rawDesc = "" +
 	"\x04data\x18\x01 \x01(\fR\x04data\"\x14\n" +
 	"\x12CreateTextResponse\"E\n" +
 	"\x11CreateDataRequest\x12\x1a\n" +
-	"\bfilename\x18\x01 \x01(\tR\bfilename\x12\x14\n" +
+	"\bfilename\x18\x01 \x01(\fR\bfilename\x12\x14\n" +
 	"\x05chunk\x18\x02 \x01(\fR\x05chunk\"\x14\n" +
 	"\x12CreateDataResponse\"\x15\n" +
 	"\x13GetPasswordsRequest\"*\n" +
@@ -809,7 +1031,17 @@ const file_internal_proto_gophkeeper_proto_rawDesc = "" +
 	"\x04data\x18\x01 \x03(\fR\x04data\"\x10\n" +
 	"\x0eGetTextRequest\"%\n" +
 	"\x0fGetTextResponse\x12\x12\n" +
-	"\x04data\x18\x01 \x03(\fR\x04data2\xb0\x05\n" +
+	"\x04data\x18\x01 \x03(\fR\x04data\"2\n" +
+	"\x04File\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
+	"\bfilename\x18\x02 \x01(\fR\bfilename\"\x10\n" +
+	"\x0eGetDataRequest\"7\n" +
+	"\x0fGetDataResponse\x12$\n" +
+	"\x04file\x18\x01 \x03(\v2\x10.gophkeeper.FileR\x04file\"!\n" +
+	"\x0fDownloadRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"(\n" +
+	"\x10DownloadResponse\x12\x14\n" +
+	"\x05chunk\x18\x02 \x01(\fR\x05chunk2\xbd\x06\n" +
 	"\n" +
 	"gophkeeper\x12E\n" +
 	"\bRegister\x12\x1b.gophkeeper.RegisterRequest\x1a\x1c.gophkeeper.RegisterResponse\x12>\n" +
@@ -823,7 +1055,9 @@ const file_internal_proto_gophkeeper_proto_rawDesc = "" +
 	"CreateData\x12\x1d.gophkeeper.CreateDataRequest\x1a\x1e.gophkeeper.CreateDataResponse(\x01\x12Q\n" +
 	"\fGetPasswords\x12\x1f.gophkeeper.GetPasswordsRequest\x1a .gophkeeper.GetPasswordsResponse\x12B\n" +
 	"\aGetBank\x12\x1a.gophkeeper.GetBankRequest\x1a\x1b.gophkeeper.GetBankResponse\x12B\n" +
-	"\aGetText\x12\x1a.gophkeeper.GetTextRequest\x1a\x1b.gophkeeper.GetTextResponseB%Z#github.com/MukizuL/GophKeeper/protob\x06proto3"
+	"\aGetText\x12\x1a.gophkeeper.GetTextRequest\x1a\x1b.gophkeeper.GetTextResponse\x12B\n" +
+	"\aGetData\x12\x1a.gophkeeper.GetDataRequest\x1a\x1b.gophkeeper.GetDataResponse\x12G\n" +
+	"\bDownload\x12\x1b.gophkeeper.DownloadRequest\x1a\x1c.gophkeeper.DownloadResponse0\x01B%Z#github.com/MukizuL/GophKeeper/protob\x06proto3"
 
 var (
 	file_internal_proto_gophkeeper_proto_rawDescOnce sync.Once
@@ -837,7 +1071,7 @@ func file_internal_proto_gophkeeper_proto_rawDescGZIP() []byte {
 	return file_internal_proto_gophkeeper_proto_rawDescData
 }
 
-var file_internal_proto_gophkeeper_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
+var file_internal_proto_gophkeeper_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
 var file_internal_proto_gophkeeper_proto_goTypes = []any{
 	(*RegisterRequest)(nil),        // 0: gophkeeper.RegisterRequest
 	(*RegisterResponse)(nil),       // 1: gophkeeper.RegisterResponse
@@ -857,31 +1091,41 @@ var file_internal_proto_gophkeeper_proto_goTypes = []any{
 	(*GetBankResponse)(nil),        // 15: gophkeeper.GetBankResponse
 	(*GetTextRequest)(nil),         // 16: gophkeeper.GetTextRequest
 	(*GetTextResponse)(nil),        // 17: gophkeeper.GetTextResponse
+	(*File)(nil),                   // 18: gophkeeper.File
+	(*GetDataRequest)(nil),         // 19: gophkeeper.GetDataRequest
+	(*GetDataResponse)(nil),        // 20: gophkeeper.GetDataResponse
+	(*DownloadRequest)(nil),        // 21: gophkeeper.DownloadRequest
+	(*DownloadResponse)(nil),       // 22: gophkeeper.DownloadResponse
 }
 var file_internal_proto_gophkeeper_proto_depIdxs = []int32{
-	0,  // 0: gophkeeper.gophkeeper.Register:input_type -> gophkeeper.RegisterRequest
-	2,  // 1: gophkeeper.gophkeeper.Authorize:input_type -> gophkeeper.AuthRequest
-	4,  // 2: gophkeeper.gophkeeper.CreatePassword:input_type -> gophkeeper.CreatePasswordRequest
-	6,  // 3: gophkeeper.gophkeeper.CreateBank:input_type -> gophkeeper.CreateBankRequest
-	8,  // 4: gophkeeper.gophkeeper.CreateText:input_type -> gophkeeper.CreateTextRequest
-	10, // 5: gophkeeper.gophkeeper.CreateData:input_type -> gophkeeper.CreateDataRequest
-	12, // 6: gophkeeper.gophkeeper.GetPasswords:input_type -> gophkeeper.GetPasswordsRequest
-	14, // 7: gophkeeper.gophkeeper.GetBank:input_type -> gophkeeper.GetBankRequest
-	16, // 8: gophkeeper.gophkeeper.GetText:input_type -> gophkeeper.GetTextRequest
-	1,  // 9: gophkeeper.gophkeeper.Register:output_type -> gophkeeper.RegisterResponse
-	3,  // 10: gophkeeper.gophkeeper.Authorize:output_type -> gophkeeper.AuthResponse
-	5,  // 11: gophkeeper.gophkeeper.CreatePassword:output_type -> gophkeeper.CreatePasswordResponse
-	7,  // 12: gophkeeper.gophkeeper.CreateBank:output_type -> gophkeeper.CreateBankResponse
-	9,  // 13: gophkeeper.gophkeeper.CreateText:output_type -> gophkeeper.CreateTextResponse
-	11, // 14: gophkeeper.gophkeeper.CreateData:output_type -> gophkeeper.CreateDataResponse
-	13, // 15: gophkeeper.gophkeeper.GetPasswords:output_type -> gophkeeper.GetPasswordsResponse
-	15, // 16: gophkeeper.gophkeeper.GetBank:output_type -> gophkeeper.GetBankResponse
-	17, // 17: gophkeeper.gophkeeper.GetText:output_type -> gophkeeper.GetTextResponse
-	9,  // [9:18] is the sub-list for method output_type
-	0,  // [0:9] is the sub-list for method input_type
-	0,  // [0:0] is the sub-list for extension type_name
-	0,  // [0:0] is the sub-list for extension extendee
-	0,  // [0:0] is the sub-list for field type_name
+	18, // 0: gophkeeper.GetDataResponse.file:type_name -> gophkeeper.File
+	0,  // 1: gophkeeper.gophkeeper.Register:input_type -> gophkeeper.RegisterRequest
+	2,  // 2: gophkeeper.gophkeeper.Authorize:input_type -> gophkeeper.AuthRequest
+	4,  // 3: gophkeeper.gophkeeper.CreatePassword:input_type -> gophkeeper.CreatePasswordRequest
+	6,  // 4: gophkeeper.gophkeeper.CreateBank:input_type -> gophkeeper.CreateBankRequest
+	8,  // 5: gophkeeper.gophkeeper.CreateText:input_type -> gophkeeper.CreateTextRequest
+	10, // 6: gophkeeper.gophkeeper.CreateData:input_type -> gophkeeper.CreateDataRequest
+	12, // 7: gophkeeper.gophkeeper.GetPasswords:input_type -> gophkeeper.GetPasswordsRequest
+	14, // 8: gophkeeper.gophkeeper.GetBank:input_type -> gophkeeper.GetBankRequest
+	16, // 9: gophkeeper.gophkeeper.GetText:input_type -> gophkeeper.GetTextRequest
+	19, // 10: gophkeeper.gophkeeper.GetData:input_type -> gophkeeper.GetDataRequest
+	21, // 11: gophkeeper.gophkeeper.Download:input_type -> gophkeeper.DownloadRequest
+	1,  // 12: gophkeeper.gophkeeper.Register:output_type -> gophkeeper.RegisterResponse
+	3,  // 13: gophkeeper.gophkeeper.Authorize:output_type -> gophkeeper.AuthResponse
+	5,  // 14: gophkeeper.gophkeeper.CreatePassword:output_type -> gophkeeper.CreatePasswordResponse
+	7,  // 15: gophkeeper.gophkeeper.CreateBank:output_type -> gophkeeper.CreateBankResponse
+	9,  // 16: gophkeeper.gophkeeper.CreateText:output_type -> gophkeeper.CreateTextResponse
+	11, // 17: gophkeeper.gophkeeper.CreateData:output_type -> gophkeeper.CreateDataResponse
+	13, // 18: gophkeeper.gophkeeper.GetPasswords:output_type -> gophkeeper.GetPasswordsResponse
+	15, // 19: gophkeeper.gophkeeper.GetBank:output_type -> gophkeeper.GetBankResponse
+	17, // 20: gophkeeper.gophkeeper.GetText:output_type -> gophkeeper.GetTextResponse
+	20, // 21: gophkeeper.gophkeeper.GetData:output_type -> gophkeeper.GetDataResponse
+	22, // 22: gophkeeper.gophkeeper.Download:output_type -> gophkeeper.DownloadResponse
+	12, // [12:23] is the sub-list for method output_type
+	1,  // [1:12] is the sub-list for method input_type
+	1,  // [1:1] is the sub-list for extension type_name
+	1,  // [1:1] is the sub-list for extension extendee
+	0,  // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_internal_proto_gophkeeper_proto_init() }
@@ -895,7 +1139,7 @@ func file_internal_proto_gophkeeper_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_proto_gophkeeper_proto_rawDesc), len(file_internal_proto_gophkeeper_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   18,
+			NumMessages:   23,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

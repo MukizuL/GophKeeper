@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/MukizuL/GophKeeper/internal/ctxutil"
 	"github.com/MukizuL/GophKeeper/internal/errs"
 	"github.com/MukizuL/GophKeeper/internal/helpers"
 	pb "github.com/MukizuL/GophKeeper/internal/proto"
@@ -77,14 +78,14 @@ func (s Services) Login(ctx context.Context, login, password string) (string, []
 	return token, user.Salt, nil
 }
 
-func (s Services) CreatePassword(ctx context.Context, token string, data []byte) error {
-	userID, err := s.jwtService.ValidateToken(token)
-	if err != nil {
-		s.logger.Error("failed to validate token", zap.String("token", token), zap.Error(err))
-		return err
+func (s Services) CreatePassword(ctx context.Context, data []byte) error {
+	userID, ok := ctx.Value(ctxutil.UserIDContextKey).(string)
+	if !ok {
+		s.logger.Error("userID is not a string", zap.Any("userID", ctx.Value(ctxutil.UserIDContextKey)))
+		return errs.ErrInternalServerError
 	}
 
-	err = s.storage.CreatePassword(ctx, userID, data)
+	err := s.storage.CreatePassword(ctx, userID, data)
 	if err != nil {
 		s.logger.Error("failed to create a new password", zap.String("userID", userID), zap.Error(err))
 		return errs.ErrInternalServerError
@@ -93,14 +94,14 @@ func (s Services) CreatePassword(ctx context.Context, token string, data []byte)
 	return nil
 }
 
-func (s Services) CreateBank(ctx context.Context, token string, data []byte) error {
-	userID, err := s.jwtService.ValidateToken(token)
-	if err != nil {
-		s.logger.Error("failed to validate token", zap.String("token", token), zap.Error(err))
-		return err
+func (s Services) CreateBank(ctx context.Context, data []byte) error {
+	userID, ok := ctx.Value(ctxutil.UserIDContextKey).(string)
+	if !ok {
+		s.logger.Error("userID is not a string", zap.Any("userID", ctx.Value(ctxutil.UserIDContextKey)))
+		return errs.ErrInternalServerError
 	}
 
-	err = s.storage.CreateBank(ctx, userID, data)
+	err := s.storage.CreateBank(ctx, userID, data)
 	if err != nil {
 		s.logger.Error("failed to create a new bank card", zap.String("userID", userID), zap.Error(err))
 		return errs.ErrInternalServerError
@@ -109,14 +110,14 @@ func (s Services) CreateBank(ctx context.Context, token string, data []byte) err
 	return nil
 }
 
-func (s Services) CreateTextual(ctx context.Context, token string, data []byte) error {
-	userID, err := s.jwtService.ValidateToken(token)
-	if err != nil {
-		s.logger.Error("failed to validate token", zap.String("token", token), zap.Error(err))
-		return err
+func (s Services) CreateTextual(ctx context.Context, data []byte) error {
+	userID, ok := ctx.Value(ctxutil.UserIDContextKey).(string)
+	if !ok {
+		s.logger.Error("userID is not a string", zap.Any("userID", ctx.Value(ctxutil.UserIDContextKey)))
+		return errs.ErrInternalServerError
 	}
 
-	err = s.storage.CreateTextual(ctx, userID, data)
+	err := s.storage.CreateTextual(ctx, userID, data)
 	if err != nil {
 		s.logger.Error("failed to create a new text", zap.String("userID", userID), zap.Error(err))
 		return errs.ErrInternalServerError
@@ -155,11 +156,11 @@ func (s Services) CreateData(ctx context.Context, token string, stream pb.Gophke
 	return nil
 }
 
-func (s Services) GetPasswords(ctx context.Context, token string) ([][]byte, error) {
-	userID, err := s.jwtService.ValidateToken(token)
-	if err != nil {
-		s.logger.Error("failed to validate token", zap.String("token", token), zap.Error(err))
-		return nil, err
+func (s Services) GetPasswords(ctx context.Context) ([][]byte, error) {
+	userID, ok := ctx.Value(ctxutil.UserIDContextKey).(string)
+	if !ok {
+		s.logger.Error("userID is not a string", zap.Any("userID", ctx.Value(ctxutil.UserIDContextKey)))
+		return nil, errs.ErrInternalServerError
 	}
 
 	response, err := s.storage.GetPasswordsByUserID(ctx, userID)
@@ -169,4 +170,76 @@ func (s Services) GetPasswords(ctx context.Context, token string) ([][]byte, err
 	}
 
 	return response, nil
+}
+
+func (s Services) GetBank(ctx context.Context) ([][]byte, error) {
+	userID, ok := ctx.Value(ctxutil.UserIDContextKey).(string)
+	if !ok {
+		s.logger.Error("userID is not a string", zap.Any("userID", ctx.Value(ctxutil.UserIDContextKey)))
+		return nil, errs.ErrInternalServerError
+	}
+
+	response, err := s.storage.GetBankByUserID(ctx, userID)
+	if err != nil {
+		s.logger.Error("failed to get a user's bank cards", zap.String("userID", userID), zap.Error(err))
+		return nil, errs.ErrInternalServerError
+	}
+
+	return response, nil
+}
+
+func (s Services) GetText(ctx context.Context) ([][]byte, error) {
+	userID, ok := ctx.Value(ctxutil.UserIDContextKey).(string)
+	if !ok {
+		s.logger.Error("userID is not a string", zap.Any("userID", ctx.Value(ctxutil.UserIDContextKey)))
+		return nil, errs.ErrInternalServerError
+	}
+
+	response, err := s.storage.GetTextualByUserID(ctx, userID)
+	if err != nil {
+		s.logger.Error("failed to get a user's texts", zap.String("userID", userID), zap.Error(err))
+		return nil, errs.ErrInternalServerError
+	}
+
+	return response, nil
+}
+
+func (s Services) GetData(ctx context.Context) ([]*pb.File, error) {
+	userID, ok := ctx.Value(ctxutil.UserIDContextKey).(string)
+	if !ok {
+		s.logger.Error("userID is not a string", zap.Any("userID", ctx.Value(ctxutil.UserIDContextKey)))
+		return nil, errs.ErrInternalServerError
+	}
+
+	refs, err := s.storage.GetReferenceByUserID(ctx, userID)
+	if err != nil {
+		s.logger.Error("failed to get a user's texts", zap.String("userID", userID), zap.Error(err))
+		return nil, errs.ErrInternalServerError
+	}
+
+	var response []*pb.File
+	for _, v := range refs {
+		response = append(response, &pb.File{
+			Id:       v.ID,
+			Filename: v.Filename,
+		})
+	}
+
+	return response, nil
+}
+
+func (s Services) Download(ctx context.Context, token, id string, stream pb.Gophkeeper_DownloadServer) error {
+	_, err := s.jwtService.ValidateToken(token)
+	if err != nil {
+		s.logger.Error("failed to validate token", zap.String("token", token), zap.Error(err))
+		return err
+	}
+
+	err = s.storage.Download(ctx, id, stream)
+	if err != nil {
+		s.logger.Error("failed to download a file", zap.String("id", id), zap.Error(err))
+		return errs.ErrInternalServerError
+	}
+
+	return nil
 }

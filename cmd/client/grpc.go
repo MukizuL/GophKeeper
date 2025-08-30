@@ -2,11 +2,15 @@ package main
 
 import (
 	"context"
+	"crypto/aes"
+	"crypto/cipher"
+	"crypto/rand"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"time"
 
 	pb "github.com/MukizuL/GophKeeper/internal/proto"
@@ -224,13 +228,15 @@ func CreateTextual(token string, dk []byte, name, text string) error {
 	return nil
 }
 
-func CreateData(token string, dk []byte, filename string, percent *float64) tea.Cmd {
+func CreateData(token string, dk []byte, path string, ch chan tea.Msg) tea.Cmd {
 	return func() tea.Msg {
-		f, err := os.Open(filename)
+		f, err := os.Open(path)
 		if err != nil {
-			return errMsg{fmt.Errorf("could not open file: %s", filename)}
+			return errMsg{fmt.Errorf("could not open file: %s", path)}
 		}
 		defer f.Close()
+
+		_, filename := filepath.Split(path)
 
 		stat, _ := f.Stat()
 		filesize := stat.Size()
@@ -241,6 +247,21 @@ func CreateData(token string, dk []byte, filename string, percent *float64) tea.
 		stream, err := conn.CreateData(ctxOut)
 		if err != nil {
 			return errMsg{errors.New("could not create stream")}
+		}
+
+		block, err := aes.NewCipher(dk)
+		if err != nil {
+			return errMsg{err}
+		}
+
+		gcm, err := cipher.NewGCM(block)
+		if err != nil {
+			return errMsg{err}
+		}
+
+		nonce := make([]byte, gcm.NonceSize())
+		if _, err = io.ReadFull(rand.Reader, nonce); err != nil {
+			return errMsg{err}
 		}
 
 		buf := make([]byte, 1024*32) // 32KB chunks
@@ -255,16 +276,27 @@ func CreateData(token string, dk []byte, filename string, percent *float64) tea.
 				return errMsg{errors.New("could not read file")}
 			}
 
-			req := &pb.CreateDataRequest{
-				Filename: filename,
-				Chunk:    buf[:n],
+			encryptedFilename, err := encrypt(dk, []byte(filename))
+			if err != nil {
+				return errMsg{err}
 			}
+
+			encryptedChunk, err := encrypt(dk, buf[:n])
+			if err != nil {
+				return errMsg{err}
+			}
+
+			req := &pb.CreateDataRequest{
+				Filename: encryptedFilename,
+				Chunk:    encryptedChunk,
+			}
+
 			if err := stream.Send(req); err != nil {
 				return errMsg{errors.New("could not send data")}
 			}
 
 			sent += int64(n)
-			*percent = float64(sent) / float64(filesize)
+			ch <- uploadProgressMsg(float64(sent) / float64(filesize))
 		}
 
 		_, err = stream.CloseAndRecv()
@@ -272,7 +304,9 @@ func CreateData(token string, dk []byte, filename string, percent *float64) tea.
 			return errMsg{errors.New("could not receive data")}
 		}
 
-		return uploadProgressMsg(1.0)
+		ch <- uploadProgressMsg(1.0)
+
+		return nil
 	}
 }
 
@@ -388,4 +422,99 @@ func GetText(token string, dk []byte) ([][]byte, error) {
 	}
 
 	return texts, nil
+}
+
+func GetData(token string, dk []byte) ([]file, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	md := metadata.Pairs("access-token", token)
+	ctxOut := metadata.NewOutgoingContext(ctx, md)
+
+	req := pb.GetDataRequest{}
+
+	data, err := conn.GetData(ctxOut, &req)
+	if err != nil {
+		if e, ok := status.FromError(err); ok {
+			switch e.Code() {
+			case codes.DeadlineExceeded:
+				return nil, fmt.Errorf("server took to long to respond: %s", e.Message())
+			case codes.Unauthenticated:
+				return nil, fmt.Errorf("%s", e.Message())
+			case codes.Internal:
+				return nil, fmt.Errorf("server error: %s", e.Message())
+			default:
+				return nil, fmt.Errorf("unknown error: %s", e.Message())
+			}
+		}
+	}
+
+	var files []file
+	for _, v := range data.File {
+		decryptedFilename, err := decrypt(dk, v.Filename)
+		if err != nil {
+			return nil, err
+		}
+
+		temp := file{
+			ID:       v.Id,
+			Filename: string(decryptedFilename),
+		}
+
+		files = append(files, temp)
+	}
+
+	return files, nil
+}
+
+func DownloadFile(token string, dk []byte, id, filename string) tea.Cmd {
+	return func() tea.Msg {
+		md := metadata.Pairs("access-token", token)
+		ctxOut := metadata.NewOutgoingContext(context.Background(), md)
+
+		req := pb.DownloadRequest{Id: id}
+
+		stream, err := conn.Download(ctxOut, &req)
+		if err != nil {
+			if e, ok := status.FromError(err); ok {
+				switch e.Code() {
+				case codes.DeadlineExceeded:
+					return errMsg{fmt.Errorf("server took to long to respond: %s", e.Message())}
+				case codes.Unauthenticated:
+					return errMsg{fmt.Errorf("%s", e.Message())}
+				case codes.Internal:
+					return errMsg{fmt.Errorf("server error: %s", e.Message())}
+				default:
+					return errMsg{fmt.Errorf("unknown error: %s", e.Message())}
+				}
+			}
+		}
+
+		f, err := os.Create(filename)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+
+		for {
+			chunk, err := stream.Recv()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				return errMsg{errors.New("error receiving chunk")}
+			}
+
+			decrypted, err := decrypt(dk, chunk.Chunk)
+			if err != nil {
+				return errMsg{err}
+			}
+
+			if _, err := f.Write(decrypted); err != nil {
+				return err
+			}
+		}
+
+		return Done{}
+	}
 }

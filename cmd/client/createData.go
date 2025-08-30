@@ -9,10 +9,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type uploadProgressMsg float64
-
-type errMsg struct{ error }
-
 type createData struct {
 	fp           filepicker.Model
 	selectedFile string
@@ -22,6 +18,7 @@ type createData struct {
 	progress     progress.Model
 	uploading    bool
 	percent      float64
+	ch           chan tea.Msg
 }
 
 func newCreateData() createData {
@@ -29,13 +26,14 @@ func newCreateData() createData {
 	fp.CurrentDirectory, _ = os.UserHomeDir()
 	fp.ShowPermissions = false
 	fp.AutoHeight = false
-	fp.SetHeight(10)
+	fp.SetHeight(14)
 
 	p := progress.New(progress.WithDefaultGradient())
 
 	return createData{
 		fp:       fp,
 		progress: p,
+		ch:       make(chan tea.Msg),
 	}
 }
 
@@ -48,7 +46,7 @@ func updateCreateData(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 			m.createData.uploading = false
 			m.window = "home"
 		}
-		return m, nil
+		return m, updateProgressBar(m.createData.ch)
 
 	case errMsg:
 		m.createData.error = msg.error
@@ -63,10 +61,10 @@ func updateCreateData(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 		m.createData.selectedFile = path
 		m.createData.uploading = true
 
-		return m, CreateData(m.token, m.dk, m.createData.selectedFile, &m.createData.percent)
+		return m, CreateData(m.token, m.dk, m.createData.selectedFile, m.createData.ch)
 	}
 
-	return m, cmd
+	return m, tea.Batch(cmd, updateProgressBar(m.createData.ch))
 }
 
 func viewCreateData(m model) string {

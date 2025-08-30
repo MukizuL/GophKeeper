@@ -83,8 +83,12 @@ type model struct {
 	storage          storage
 	storagePasswords storagePasswords
 	storageBank      storageBank
+	storageText      storageText
+	storageData      storageData
 	viewPassword     viewPassword
 	viewBank         viewBank
+	viewText         viewText
+	viewData         viewData
 	window           string
 }
 
@@ -127,10 +131,18 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return updateStoragePasswords(msg, m)
 	case "storage-bank":
 		return updateStorageBank(msg, m)
+	case "storage-text":
+		return updateStorageText(msg, m)
+	case "storage-data":
+		return updateStorageData(msg, m)
 	case "view-password":
 		return updateViewPassword(msg, m)
 	case "view-bank":
 		return updateViewBank(msg, m)
+	case "view-text":
+		return updateViewText(msg, m)
+	case "view-data":
+		return updateViewData(msg, m)
 	default:
 		return m, nil
 	}
@@ -164,10 +176,18 @@ func (m model) View() string {
 		return viewStoragePasswords(m)
 	case "storage-bank":
 		return viewStorageBank(m)
+	case "storage-text":
+		return viewStorageText(m)
+	case "storage-data":
+		return viewStorageData(m)
 	case "view-password":
 		return viewViewPassword(m)
 	case "view-bank":
 		return viewViewBank(m)
+	case "view-text":
+		return viewViewText(m)
+	case "view-data":
+		return viewViewData(m)
 	default:
 		return "Unknown window."
 	}

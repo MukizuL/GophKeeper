@@ -83,7 +83,7 @@ func updateCreatePassword(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 					m.createPassword.error = errors.New("name/site cannot be empty")
 					return m, nil
 				}
-				// TODO: Should reject same login/password combination within the same site.
+
 				err := CreatePassword(m.token, m.dk,
 					m.createPassword.inputs[0].Value(),
 					m.createPassword.inputs[1].Value(),

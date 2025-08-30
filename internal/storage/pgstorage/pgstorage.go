@@ -2,10 +2,12 @@ package pgstorage
 
 import (
 	"context"
+	"errors"
 	"io"
 	"os"
 	"path/filepath"
 
+	"github.com/MukizuL/GophKeeper/internal/dto"
 	"github.com/MukizuL/GophKeeper/internal/models"
 	pb "github.com/MukizuL/GophKeeper/internal/proto"
 )
@@ -68,7 +70,7 @@ func (s PGStorage) CreateTextual(ctx context.Context, userID string, data []byte
 	return nil
 }
 
-func (s PGStorage) CreateReference(ctx context.Context, userID string, id, filename string) error {
+func (s PGStorage) CreateReference(ctx context.Context, userID string, id string, filename []byte) error {
 	_, err := s.conn.Exec(ctx, `INSERT INTO files (id, user_id, filename) VALUES ($1, $2, $3)`, id, userID, filename)
 	if err != nil {
 		return err
@@ -77,21 +79,41 @@ func (s PGStorage) CreateReference(ctx context.Context, userID string, id, filen
 	return nil
 }
 
-func (s PGStorage) CreateData(ctx context.Context, id string, stream pb.Gophkeeper_CreateDataServer) (string, error) {
+func (s PGStorage) GetReferenceByUserID(ctx context.Context, userID string) ([]dto.FileReference, error) {
+	var out []dto.FileReference
+	rows, err := s.conn.Query(ctx, `SELECT id, filename FROM files WHERE user_id = $1 ORDER BY id`, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+	for rows.Next() {
+		var data dto.FileReference
+		if err := rows.Scan(&data.ID, &data.Filename); err != nil {
+			return nil, err
+		}
+
+		out = append(out, data)
+	}
+
+	return out, nil
+}
+
+func (s PGStorage) CreateData(ctx context.Context, id string, stream pb.Gophkeeper_CreateDataServer) ([]byte, error) {
 	fullPath := filepath.Join(s.cfg.Filepath, id)
 
 	err := os.MkdirAll(filepath.Dir(fullPath), 0755)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	f, err := os.Create(fullPath)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer f.Close()
 
-	var filepath string
+	var filepath []byte
 	first := true
 
 	for {
@@ -100,7 +122,7 @@ func (s PGStorage) CreateData(ctx context.Context, id string, stream pb.Gophkeep
 			break
 		}
 		if err != nil {
-			return "", err
+			return nil, err
 		}
 
 		if first {
@@ -109,16 +131,16 @@ func (s PGStorage) CreateData(ctx context.Context, id string, stream pb.Gophkeep
 		}
 
 		if _, err := f.Write(chunk.Chunk); err != nil {
-			return "", err
+			return nil, err
 		}
 	}
 
 	return filepath, stream.SendAndClose(&pb.CreateDataResponse{})
 }
 
-func (s PGStorage) GetPasswordsByUserID(ctx context.Context, id string) ([][]byte, error) {
+func (s PGStorage) GetPasswordsByUserID(ctx context.Context, userID string) ([][]byte, error) {
 	var out [][]byte
-	rows, err := s.conn.Query(ctx, `SELECT data FROM passwords WHERE user_id = $1 ORDER BY id`, id)
+	rows, err := s.conn.Query(ctx, `SELECT data FROM passwords WHERE user_id = $1 ORDER BY id`, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -136,9 +158,9 @@ func (s PGStorage) GetPasswordsByUserID(ctx context.Context, id string) ([][]byt
 	return out, nil
 }
 
-func (s PGStorage) GetBankByUserID(ctx context.Context, id string) ([][]byte, error) {
+func (s PGStorage) GetBankByUserID(ctx context.Context, userID string) ([][]byte, error) {
 	var out [][]byte
-	rows, err := s.conn.Query(ctx, `SELECT data FROM bank WHERE user_id = $1 ORDER BY id`, id)
+	rows, err := s.conn.Query(ctx, `SELECT data FROM bank WHERE user_id = $1 ORDER BY id`, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -156,9 +178,9 @@ func (s PGStorage) GetBankByUserID(ctx context.Context, id string) ([][]byte, er
 	return out, nil
 }
 
-func (s PGStorage) GetTextualByUserID(ctx context.Context, id string) ([][]byte, error) {
+func (s PGStorage) GetTextualByUserID(ctx context.Context, userID string) ([][]byte, error) {
 	var out [][]byte
-	rows, err := s.conn.Query(ctx, `SELECT data FROM textual WHERE user_id = $1 ORDER BY id`, id)
+	rows, err := s.conn.Query(ctx, `SELECT data FROM textual WHERE user_id = $1 ORDER BY id`, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -174,4 +196,35 @@ func (s PGStorage) GetTextualByUserID(ctx context.Context, id string) ([][]byte,
 	}
 
 	return out, nil
+}
+
+func (s PGStorage) Download(ctx context.Context, id string, stream pb.Gophkeeper_DownloadServer) error {
+	fullPath := filepath.Join(s.cfg.Filepath, id)
+
+	f, err := os.Open(fullPath)
+	if err != nil {
+		return err
+	}
+
+	buf := make([]byte, 32_796)
+
+	for {
+		n, err := f.Read(buf)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return errors.New("could not read file")
+		}
+
+		req := &pb.DownloadResponse{
+			Chunk: buf[:n],
+		}
+
+		if err := stream.Send(req); err != nil {
+			return errors.New("could not send data")
+		}
+	}
+
+	return nil
 }

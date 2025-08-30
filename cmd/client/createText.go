@@ -27,6 +27,7 @@ func newCreateText() createText {
 	ti.Width = 30
 
 	ta := textarea.New()
+	ta.SetHeight(6)
 
 	return createText{
 		name: ti,
@@ -54,13 +55,13 @@ func updateCreateText(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 
 			// Did the user press enter while the submit button was focused?
 			// If so, exit.
-			if s == "enter" && m.createText.focusIndex == 3 {
+			if s == "enter" && m.createText.focusIndex == 2 {
 				if m.createText.name.Value() == "" {
 					m.createText.error = fmt.Errorf("name cannot be empty")
 					return m, nil
 				}
 				m.createText.error = nil
-				// TODO: Each name should be unique and not empty.
+
 				err := CreateTextual(m.token, m.dk,
 					m.createText.name.Value(),
 					m.createText.text.Value(),
@@ -77,7 +78,7 @@ func updateCreateText(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 			}
 
 			// If user hits Back, return him to Create
-			if s == "enter" && m.createText.focusIndex == 4 {
+			if s == "enter" && m.createText.focusIndex == 3 {
 				m.window = "create"
 				resetCreateText(&m)
 				return m, nil
@@ -140,13 +141,9 @@ func viewCreateText(m model) string {
 	b.WriteString(titleStyle.Render("Create text entry"))
 	b.WriteString("\n\n")
 
-	//b.WriteString(titleStyle.Render("Name"))
-	//b.WriteString("\n")
 	b.WriteString(m.createText.name.View())
 	b.WriteString("\n\n")
 
-	//b.WriteString(titleStyle.Render("Text"))
-	//b.WriteString("\n")
 	b.WriteString(m.createText.text.View())
 	b.WriteString("\n\n")
 
@@ -160,7 +157,7 @@ func viewCreateText(m model) string {
 		back = backButtonFocused
 	}
 
-	fmt.Fprintf(&b, "\n\n%s\n%s\n\n", ok, back)
+	fmt.Fprintf(&b, "\n%s\n%s\n\n", ok, back)
 
 	return b.String()
 }

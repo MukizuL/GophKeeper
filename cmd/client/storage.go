@@ -54,8 +54,10 @@ func updateStorage(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 					m.storageBank = newStorageBank(m)
 				case "Texts":
 					m.window = "storage-text"
+					m.storageText = newStorageText(m)
 				case "Data":
 					m.window = "storage-data"
+					m.storageData = newStorageData(m)
 				case "Back":
 					m.window = "home"
 				}
