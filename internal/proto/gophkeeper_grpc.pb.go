@@ -4,6 +4,8 @@
 // - protoc             v6.31.1
 // source: internal/proto/gophkeeper.proto
 
+//go:generate mockgen . Gophkeeper_CreateDataServer,Gophkeeper_DownloadServer
+
 package proto
 
 import (

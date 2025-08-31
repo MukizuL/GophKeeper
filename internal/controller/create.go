@@ -14,12 +14,7 @@ import (
 func (c Controller) CreatePassword(ctx context.Context, in *pb.CreatePasswordRequest) (*pb.CreatePasswordResponse, error) {
 	err := c.services.CreatePassword(ctx, in.Data)
 	if err != nil {
-		switch {
-		case errors.Is(err, errs.ErrNotAuthorized):
-			return nil, status.Error(codes.Unauthenticated, err.Error())
-		default:
-			return nil, status.Error(codes.Internal, "Internal Server Error")
-		}
+		return nil, status.Error(codes.Internal, "Internal Server Error")
 	}
 
 	return &pb.CreatePasswordResponse{}, nil
@@ -28,12 +23,7 @@ func (c Controller) CreatePassword(ctx context.Context, in *pb.CreatePasswordReq
 func (c Controller) CreateBank(ctx context.Context, in *pb.CreateBankRequest) (*pb.CreateBankResponse, error) {
 	err := c.services.CreateBank(ctx, in.Data)
 	if err != nil {
-		switch {
-		case errors.Is(err, errs.ErrNotAuthorized):
-			return nil, status.Error(codes.Unauthenticated, err.Error())
-		default:
-			return nil, status.Error(codes.Internal, "Internal Server Error")
-		}
+		return nil, status.Error(codes.Internal, "Internal Server Error")
 	}
 
 	return &pb.CreateBankResponse{}, nil
@@ -42,12 +32,7 @@ func (c Controller) CreateBank(ctx context.Context, in *pb.CreateBankRequest) (*
 func (c Controller) CreateText(ctx context.Context, in *pb.CreateTextRequest) (*pb.CreateTextResponse, error) {
 	err := c.services.CreateTextual(ctx, in.Data)
 	if err != nil {
-		switch {
-		case errors.Is(err, errs.ErrNotAuthorized):
-			return nil, status.Error(codes.Unauthenticated, err.Error())
-		default:
-			return nil, status.Error(codes.Internal, "Internal Server Error")
-		}
+		return nil, status.Error(codes.Internal, "Internal Server Error")
 	}
 
 	return &pb.CreateTextResponse{}, nil

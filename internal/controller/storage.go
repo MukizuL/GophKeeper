@@ -14,12 +14,7 @@ import (
 func (c Controller) GetPasswords(ctx context.Context, in *pb.GetPasswordsRequest) (*pb.GetPasswordsResponse, error) {
 	data, err := c.services.GetPasswords(ctx)
 	if err != nil {
-		switch {
-		case errors.Is(err, errs.ErrNotAuthorized):
-			return nil, status.Error(codes.Unauthenticated, err.Error())
-		default:
-			return nil, status.Error(codes.Internal, "Internal Server Error")
-		}
+		return nil, status.Error(codes.Internal, "Internal Server Error")
 	}
 
 	return &pb.GetPasswordsResponse{
@@ -30,12 +25,7 @@ func (c Controller) GetPasswords(ctx context.Context, in *pb.GetPasswordsRequest
 func (c Controller) GetBank(ctx context.Context, in *pb.GetBankRequest) (*pb.GetBankResponse, error) {
 	data, err := c.services.GetBank(ctx)
 	if err != nil {
-		switch {
-		case errors.Is(err, errs.ErrNotAuthorized):
-			return nil, status.Error(codes.Unauthenticated, err.Error())
-		default:
-			return nil, status.Error(codes.Internal, "Internal Server Error")
-		}
+		return nil, status.Error(codes.Internal, "Internal Server Error")
 	}
 
 	return &pb.GetBankResponse{
@@ -46,12 +36,7 @@ func (c Controller) GetBank(ctx context.Context, in *pb.GetBankRequest) (*pb.Get
 func (c Controller) GetText(ctx context.Context, in *pb.GetTextRequest) (*pb.GetTextResponse, error) {
 	data, err := c.services.GetText(ctx)
 	if err != nil {
-		switch {
-		case errors.Is(err, errs.ErrNotAuthorized):
-			return nil, status.Error(codes.Unauthenticated, err.Error())
-		default:
-			return nil, status.Error(codes.Internal, "Internal Server Error")
-		}
+		return nil, status.Error(codes.Internal, "Internal Server Error")
 	}
 
 	return &pb.GetTextResponse{
@@ -62,18 +47,14 @@ func (c Controller) GetText(ctx context.Context, in *pb.GetTextRequest) (*pb.Get
 func (c Controller) GetData(ctx context.Context, in *pb.GetDataRequest) (*pb.GetDataResponse, error) {
 	data, err := c.services.GetData(ctx)
 	if err != nil {
-		switch {
-		case errors.Is(err, errs.ErrNotAuthorized):
-			return nil, status.Error(codes.Unauthenticated, err.Error())
-		default:
-			return nil, status.Error(codes.Internal, "Internal Server Error")
-		}
+		return nil, status.Error(codes.Internal, "Internal Server Error")
 	}
 
 	return &pb.GetDataResponse{
 		File: data,
 	}, nil
 }
+
 func (c Controller) Download(in *pb.DownloadRequest, stream pb.Gophkeeper_DownloadServer) error {
 	ctx := stream.Context()
 
@@ -82,7 +63,7 @@ func (c Controller) Download(in *pb.DownloadRequest, stream pb.Gophkeeper_Downlo
 		return status.Error(codes.Unauthenticated, err.Error())
 	}
 
-	err = c.services.Download(stream.Context(), token, in.Id, stream)
+	err = c.services.Download(ctx, token, in.Id, stream)
 	if err != nil {
 		switch {
 		case errors.Is(err, errs.ErrNotAuthorized):
