@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/MukizuL/GophKeeper/internal/ctxutil"
+	"github.com/MukizuL/GophKeeper/internal/dto"
 	"github.com/MukizuL/GophKeeper/internal/errs"
 	mockjwt "github.com/MukizuL/GophKeeper/internal/jwt/mocks"
 	"github.com/MukizuL/GophKeeper/internal/models"
@@ -777,7 +778,7 @@ func TestGetData(t *testing.T) {
 		name        string
 		ctx         context.Context
 		mockStorage func(m *mockstorage.MockRepository)
-		wantData    [][]byte
+		wantData    []*pb.File
 		wantErr     error
 	}{
 		{
@@ -786,10 +787,16 @@ func TestGetData(t *testing.T) {
 			mockStorage: func(m *mockstorage.MockRepository) {
 				m.EXPECT().
 					GetReferenceByUserID(gomock.Any(), "user-123").
-					Return([][]byte{[]byte("secret1"), []byte("secret2")}, nil)
+					Return([]dto.FileReference{
+						{ID: "1", Filename: []byte("filename1")},
+						{ID: "2", Filename: []byte("filename2")},
+					}, nil)
 			},
-			wantData: [][]byte{[]byte("secret1"), []byte("secret2")},
-			wantErr:  nil,
+			wantData: []*pb.File{
+				{Id: "1", Filename: []byte("filename1")},
+				{Id: "2", Filename: []byte("filename2")},
+			},
+			wantErr: nil,
 		},
 		{
 			name:        "userID wrong type",
