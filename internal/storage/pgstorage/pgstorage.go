@@ -2,14 +2,9 @@ package pgstorage
 
 import (
 	"context"
-	"errors"
-	"io"
-	"os"
-	"path/filepath"
 
 	"github.com/MukizuL/GophKeeper/internal/dto"
 	"github.com/MukizuL/GophKeeper/internal/models"
-	pb "github.com/MukizuL/GophKeeper/internal/proto"
 )
 
 func (s PGStorage) CreateNewUser(ctx context.Context, login string, passwordHash, salt []byte) error {
@@ -99,45 +94,6 @@ func (s PGStorage) GetReferenceByUserID(ctx context.Context, userID string) ([]d
 	return out, nil
 }
 
-func (s PGStorage) CreateData(ctx context.Context, id string, stream pb.Gophkeeper_CreateDataServer) ([]byte, error) {
-	fullPath := filepath.Join(s.cfg.Filepath, id)
-
-	err := os.MkdirAll(filepath.Dir(fullPath), 0755)
-	if err != nil {
-		return nil, err
-	}
-
-	f, err := os.Create(fullPath)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-
-	var filepath []byte
-	first := true
-
-	for {
-		chunk, err := stream.Recv()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return nil, err
-		}
-
-		if first {
-			filepath = chunk.Filename
-			first = false
-		}
-
-		if _, err := f.Write(chunk.Chunk); err != nil {
-			return nil, err
-		}
-	}
-
-	return filepath, stream.SendAndClose(&pb.CreateDataResponse{})
-}
-
 func (s PGStorage) GetPasswordsByUserID(ctx context.Context, userID string) ([][]byte, error) {
 	var out [][]byte
 	rows, err := s.conn.Query(ctx, `SELECT data FROM passwords WHERE user_id = $1 ORDER BY id`, userID)
@@ -196,35 +152,4 @@ func (s PGStorage) GetTextualByUserID(ctx context.Context, userID string) ([][]b
 	}
 
 	return out, nil
-}
-
-func (s PGStorage) Download(ctx context.Context, id string, stream pb.Gophkeeper_DownloadServer) error {
-	fullPath := filepath.Join(s.cfg.Filepath, id)
-
-	f, err := os.Open(fullPath)
-	if err != nil {
-		return err
-	}
-
-	buf := make([]byte, 32_796)
-
-	for {
-		n, err := f.Read(buf)
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return errors.New("could not read file")
-		}
-
-		req := &pb.DownloadResponse{
-			Chunk: buf[:n],
-		}
-
-		if err := stream.Send(req); err != nil {
-			return errors.New("could not send data")
-		}
-	}
-
-	return nil
 }

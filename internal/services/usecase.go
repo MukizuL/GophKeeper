@@ -79,13 +79,13 @@ func (s Services) Login(ctx context.Context, login, password string) (string, []
 }
 
 func (s Services) CreatePassword(ctx context.Context, data []byte) error {
-	userID, ok := ctx.Value(ctxutil.UserIDContextKey).(string)
-	if !ok {
-		s.logger.Error("userID is not a string", zap.Any("userID", ctx.Value(ctxutil.UserIDContextKey)))
+	userID, err := helpers.GetUserIDFromContext(ctx)
+	if err != nil {
+		s.logger.Error(err.Error(), zap.Any("userID", ctx.Value(ctxutil.UserIDContextKey)))
 		return errs.ErrInternalServerError
 	}
 
-	err := s.storage.CreatePassword(ctx, userID, data)
+	err = s.storage.CreatePassword(ctx, userID, data)
 	if err != nil {
 		s.logger.Error("failed to create a new password", zap.String("userID", userID), zap.Error(err))
 		return errs.ErrInternalServerError
@@ -95,13 +95,13 @@ func (s Services) CreatePassword(ctx context.Context, data []byte) error {
 }
 
 func (s Services) CreateBank(ctx context.Context, data []byte) error {
-	userID, ok := ctx.Value(ctxutil.UserIDContextKey).(string)
-	if !ok {
-		s.logger.Error("userID is not a string", zap.Any("userID", ctx.Value(ctxutil.UserIDContextKey)))
+	userID, err := helpers.GetUserIDFromContext(ctx)
+	if err != nil {
+		s.logger.Error(err.Error(), zap.Any("userID", ctx.Value(ctxutil.UserIDContextKey)))
 		return errs.ErrInternalServerError
 	}
 
-	err := s.storage.CreateBank(ctx, userID, data)
+	err = s.storage.CreateBank(ctx, userID, data)
 	if err != nil {
 		s.logger.Error("failed to create a new bank card", zap.String("userID", userID), zap.Error(err))
 		return errs.ErrInternalServerError
@@ -111,13 +111,13 @@ func (s Services) CreateBank(ctx context.Context, data []byte) error {
 }
 
 func (s Services) CreateTextual(ctx context.Context, data []byte) error {
-	userID, ok := ctx.Value(ctxutil.UserIDContextKey).(string)
-	if !ok {
-		s.logger.Error("userID is not a string", zap.Any("userID", ctx.Value(ctxutil.UserIDContextKey)))
+	userID, err := helpers.GetUserIDFromContext(ctx)
+	if err != nil {
+		s.logger.Error(err.Error(), zap.Any("userID", ctx.Value(ctxutil.UserIDContextKey)))
 		return errs.ErrInternalServerError
 	}
 
-	err := s.storage.CreateTextual(ctx, userID, data)
+	err = s.storage.CreateTextual(ctx, userID, data)
 	if err != nil {
 		s.logger.Error("failed to create a new text", zap.String("userID", userID), zap.Error(err))
 		return errs.ErrInternalServerError
@@ -157,9 +157,9 @@ func (s Services) CreateData(ctx context.Context, token string, stream pb.Gophke
 }
 
 func (s Services) GetPasswords(ctx context.Context) ([][]byte, error) {
-	userID, ok := ctx.Value(ctxutil.UserIDContextKey).(string)
-	if !ok {
-		s.logger.Error("userID is not a string", zap.Any("userID", ctx.Value(ctxutil.UserIDContextKey)))
+	userID, err := helpers.GetUserIDFromContext(ctx)
+	if err != nil {
+		s.logger.Error(err.Error(), zap.Any("userID", ctx.Value(ctxutil.UserIDContextKey)))
 		return nil, errs.ErrInternalServerError
 	}
 
@@ -173,9 +173,9 @@ func (s Services) GetPasswords(ctx context.Context) ([][]byte, error) {
 }
 
 func (s Services) GetBank(ctx context.Context) ([][]byte, error) {
-	userID, ok := ctx.Value(ctxutil.UserIDContextKey).(string)
-	if !ok {
-		s.logger.Error("userID is not a string", zap.Any("userID", ctx.Value(ctxutil.UserIDContextKey)))
+	userID, err := helpers.GetUserIDFromContext(ctx)
+	if err != nil {
+		s.logger.Error(err.Error(), zap.Any("userID", ctx.Value(ctxutil.UserIDContextKey)))
 		return nil, errs.ErrInternalServerError
 	}
 
@@ -189,9 +189,9 @@ func (s Services) GetBank(ctx context.Context) ([][]byte, error) {
 }
 
 func (s Services) GetText(ctx context.Context) ([][]byte, error) {
-	userID, ok := ctx.Value(ctxutil.UserIDContextKey).(string)
-	if !ok {
-		s.logger.Error("userID is not a string", zap.Any("userID", ctx.Value(ctxutil.UserIDContextKey)))
+	userID, err := helpers.GetUserIDFromContext(ctx)
+	if err != nil {
+		s.logger.Error(err.Error(), zap.Any("userID", ctx.Value(ctxutil.UserIDContextKey)))
 		return nil, errs.ErrInternalServerError
 	}
 
@@ -205,9 +205,9 @@ func (s Services) GetText(ctx context.Context) ([][]byte, error) {
 }
 
 func (s Services) GetData(ctx context.Context) ([]*pb.File, error) {
-	userID, ok := ctx.Value(ctxutil.UserIDContextKey).(string)
-	if !ok {
-		s.logger.Error("userID is not a string", zap.Any("userID", ctx.Value(ctxutil.UserIDContextKey)))
+	userID, err := helpers.GetUserIDFromContext(ctx)
+	if err != nil {
+		s.logger.Error(err.Error(), zap.Any("userID", ctx.Value(ctxutil.UserIDContextKey)))
 		return nil, errs.ErrInternalServerError
 	}
 

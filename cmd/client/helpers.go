@@ -13,32 +13,14 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"golang.org/x/crypto/argon2"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
-func validateLogin(login string) error {
-	if utf8.RuneCountInString(login) < 3 {
-		return fmt.Errorf("login must be at least 3 characters")
-	}
-	if utf8.RuneCountInString(login) > 255 {
-		return fmt.Errorf("login must be at most 255 characters")
-	}
-
-	return nil
-}
-
-func validatePassword(password string) error {
-	if utf8.RuneCountInString(password) < 8 {
-		return fmt.Errorf("password must be at least 8 characters")
-	}
-	if utf8.RuneCountInString(password) > 36 {
-		return fmt.Errorf("password must be at most 36 characters")
-	}
-	if len(password) > 72 {
-		return fmt.Errorf("password is %d characters but is longer than 72 bytes", utf8.RuneCountInString(password))
-	}
-
-	return nil
-}
+const iterations = 1     // number of iterations
+const memory = 64 * 1024 // 64 MB
+const threads = 4        // parallelism
+const keyLen = 32        // AES-256
 
 func focusOrBlur(inputs []textinput.Model, focusIndex int) []tea.Cmd {
 	cmds := make([]tea.Cmd, len(inputs))
@@ -59,12 +41,7 @@ func focusOrBlur(inputs []textinput.Model, focusIndex int) []tea.Cmd {
 
 // deriveKey generates a strong key from a password using Argon2id.
 func deriveKey(password string, salt []byte) ([]byte, error) {
-	const time = 1           // number of iterations
-	const memory = 64 * 1024 // 64 MB
-	const threads = 4        // parallelism
-	const keyLen = 32        // AES-256
-
-	key := argon2.IDKey([]byte(password), salt, time, memory, uint8(threads), keyLen)
+	key := argon2.IDKey([]byte(password), salt, iterations, memory, uint8(threads), keyLen)
 	return key, nil
 }
 
@@ -167,4 +144,20 @@ func updateProgressBar(ch chan tea.Msg) tea.Cmd {
 		}
 		return nil
 	}
+}
+
+func handleGRPCError(err error) error {
+	if e, ok := status.FromError(err); ok {
+		switch e.Code() {
+		case codes.DeadlineExceeded:
+			return fmt.Errorf("server took to long to respond: %s", e.Message())
+		case codes.Unauthenticated:
+			return fmt.Errorf("%s", e.Message())
+		case codes.Internal:
+			return fmt.Errorf("server error: %s", e.Message())
+		default:
+			return fmt.Errorf("unknown error: %s", e.Message())
+		}
+	}
+	return err
 }

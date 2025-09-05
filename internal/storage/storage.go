@@ -7,6 +7,7 @@ import (
 	"github.com/MukizuL/GophKeeper/internal/dto"
 	"github.com/MukizuL/GophKeeper/internal/models"
 	pb "github.com/MukizuL/GophKeeper/internal/proto"
+	"github.com/MukizuL/GophKeeper/internal/storage/file"
 	"github.com/MukizuL/GophKeeper/internal/storage/pgstorage"
 	"go.uber.org/fx"
 )
@@ -31,8 +32,13 @@ type Repository interface {
 	Download(ctx context.Context, id string, stream pb.Gophkeeper_DownloadServer) error
 }
 
-func newRepository(cfg *config.Config, p *pgstorage.PGStorage) Repository {
-	return p
+type RepositoryImpl struct {
+	*pgstorage.PGStorage
+	*file.Storage
+}
+
+func newRepository(cfg *config.Config, p *pgstorage.PGStorage, f *file.Storage) Repository {
+	return RepositoryImpl{p, f}
 }
 
 func Provide() fx.Option {

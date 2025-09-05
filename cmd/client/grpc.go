@@ -16,9 +16,7 @@ import (
 	pb "github.com/MukizuL/GophKeeper/internal/proto"
 	tea "github.com/charmbracelet/bubbletea"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
-	"google.golang.org/grpc/status"
 )
 
 func Register(login, password string) error {
@@ -41,19 +39,9 @@ func Register(login, password string) error {
 	defer cancel()
 
 	_, err = conn.Register(ctx, &req)
+	err = handleGRPCError(err)
 	if err != nil {
-		if e, ok := status.FromError(err); ok {
-			switch e.Code() {
-			case codes.DeadlineExceeded:
-				return fmt.Errorf("server took to long to respond: %s", e.Message())
-			case codes.FailedPrecondition:
-				return fmt.Errorf("user with same login already exists: %s", e.Message())
-			case codes.Internal:
-				return fmt.Errorf("server error: %s", e.Message())
-			default:
-				return fmt.Errorf("unknown error: %s", e.Message())
-			}
-		}
+		return err
 	}
 
 	return nil
@@ -80,19 +68,9 @@ func Login(login, password string) (string, []byte, error) {
 
 	var header metadata.MD
 	_, err = conn.Authorize(ctx, &req, grpc.Header(&header))
+	err = handleGRPCError(err)
 	if err != nil {
-		if e, ok := status.FromError(err); ok {
-			switch e.Code() {
-			case codes.DeadlineExceeded:
-				return "", nil, fmt.Errorf("server took to long to respond: %s", e.Message())
-			case codes.Unauthenticated:
-				return "", nil, fmt.Errorf("%s", e.Message())
-			case codes.Internal:
-				return "", nil, fmt.Errorf("server error: %s", e.Message())
-			default:
-				return "", nil, fmt.Errorf("unknown error: %s", e.Message())
-			}
-		}
+		return "", nil, err
 	}
 
 	tokens := header.Get("access-token")
@@ -130,19 +108,9 @@ func CreatePassword(token string, dk []byte, name, login, password, description 
 	}
 
 	_, err = conn.CreatePassword(ctxOut, &req)
+	err = handleGRPCError(err)
 	if err != nil {
-		if e, ok := status.FromError(err); ok {
-			switch e.Code() {
-			case codes.DeadlineExceeded:
-				return fmt.Errorf("server took to long to respond: %s", e.Message())
-			case codes.Unauthenticated:
-				return fmt.Errorf("%s", e.Message())
-			case codes.Internal:
-				return fmt.Errorf("server error: %s", e.Message())
-			default:
-				return fmt.Errorf("unknown error: %s", e.Message())
-			}
-		}
+		return err
 	}
 
 	return nil
@@ -170,19 +138,9 @@ func CreateBank(token string, dk []byte, ccn, exp, cvv, name string) error {
 	}
 
 	_, err = conn.CreateBank(ctxOut, &req)
+	err = handleGRPCError(err)
 	if err != nil {
-		if e, ok := status.FromError(err); ok {
-			switch e.Code() {
-			case codes.DeadlineExceeded:
-				return fmt.Errorf("server took to long to respond: %s", e.Message())
-			case codes.Unauthenticated:
-				return fmt.Errorf("%s", e.Message())
-			case codes.Internal:
-				return fmt.Errorf("server error: %s", e.Message())
-			default:
-				return fmt.Errorf("unknown error: %s", e.Message())
-			}
-		}
+		return err
 	}
 
 	return nil
@@ -210,19 +168,9 @@ func CreateTextual(token string, dk []byte, name, text string) error {
 	}
 
 	_, err = conn.CreateText(ctxOut, &req)
+	err = handleGRPCError(err)
 	if err != nil {
-		if e, ok := status.FromError(err); ok {
-			switch e.Code() {
-			case codes.DeadlineExceeded:
-				return fmt.Errorf("server took to long to respond: %s", e.Message())
-			case codes.Unauthenticated:
-				return fmt.Errorf("%s", e.Message())
-			case codes.Internal:
-				return fmt.Errorf("server error: %s", e.Message())
-			default:
-				return fmt.Errorf("unknown error: %s", e.Message())
-			}
-		}
+		return err
 	}
 
 	return nil
@@ -320,19 +268,9 @@ func GetPasswords(token string, dk []byte) ([][]byte, error) {
 	req := pb.GetPasswordsRequest{}
 
 	data, err := conn.GetPasswords(ctxOut, &req)
+	err = handleGRPCError(err)
 	if err != nil {
-		if e, ok := status.FromError(err); ok {
-			switch e.Code() {
-			case codes.DeadlineExceeded:
-				return nil, fmt.Errorf("server took to long to respond: %s", e.Message())
-			case codes.Unauthenticated:
-				return nil, fmt.Errorf("%s", e.Message())
-			case codes.Internal:
-				return nil, fmt.Errorf("server error: %s", e.Message())
-			default:
-				return nil, fmt.Errorf("unknown error: %s", e.Message())
-			}
-		}
+		return nil, err
 	}
 
 	var passwords [][]byte
@@ -358,19 +296,9 @@ func GetBank(token string, dk []byte) ([][]byte, error) {
 	req := pb.GetBankRequest{}
 
 	data, err := conn.GetBank(ctxOut, &req)
+	err = handleGRPCError(err)
 	if err != nil {
-		if e, ok := status.FromError(err); ok {
-			switch e.Code() {
-			case codes.DeadlineExceeded:
-				return nil, fmt.Errorf("server took to long to respond: %s", e.Message())
-			case codes.Unauthenticated:
-				return nil, fmt.Errorf("%s", e.Message())
-			case codes.Internal:
-				return nil, fmt.Errorf("server error: %s", e.Message())
-			default:
-				return nil, fmt.Errorf("unknown error: %s", e.Message())
-			}
-		}
+		return nil, err
 	}
 
 	var banks [][]byte
@@ -396,19 +324,9 @@ func GetText(token string, dk []byte) ([][]byte, error) {
 	req := pb.GetTextRequest{}
 
 	data, err := conn.GetText(ctxOut, &req)
+	err = handleGRPCError(err)
 	if err != nil {
-		if e, ok := status.FromError(err); ok {
-			switch e.Code() {
-			case codes.DeadlineExceeded:
-				return nil, fmt.Errorf("server took to long to respond: %s", e.Message())
-			case codes.Unauthenticated:
-				return nil, fmt.Errorf("%s", e.Message())
-			case codes.Internal:
-				return nil, fmt.Errorf("server error: %s", e.Message())
-			default:
-				return nil, fmt.Errorf("unknown error: %s", e.Message())
-			}
-		}
+		return nil, err
 	}
 
 	var texts [][]byte
@@ -434,19 +352,9 @@ func GetData(token string, dk []byte) ([]file, error) {
 	req := pb.GetDataRequest{}
 
 	data, err := conn.GetData(ctxOut, &req)
+	err = handleGRPCError(err)
 	if err != nil {
-		if e, ok := status.FromError(err); ok {
-			switch e.Code() {
-			case codes.DeadlineExceeded:
-				return nil, fmt.Errorf("server took to long to respond: %s", e.Message())
-			case codes.Unauthenticated:
-				return nil, fmt.Errorf("%s", e.Message())
-			case codes.Internal:
-				return nil, fmt.Errorf("server error: %s", e.Message())
-			default:
-				return nil, fmt.Errorf("unknown error: %s", e.Message())
-			}
-		}
+		return nil, err
 	}
 
 	var files []file
@@ -475,19 +383,9 @@ func DownloadFile(token string, dk []byte, id, filename string) tea.Cmd {
 		req := pb.DownloadRequest{Id: id}
 
 		stream, err := conn.Download(ctxOut, &req)
+		err = handleGRPCError(err)
 		if err != nil {
-			if e, ok := status.FromError(err); ok {
-				switch e.Code() {
-				case codes.DeadlineExceeded:
-					return errMsg{fmt.Errorf("server took to long to respond: %s", e.Message())}
-				case codes.Unauthenticated:
-					return errMsg{fmt.Errorf("%s", e.Message())}
-				case codes.Internal:
-					return errMsg{fmt.Errorf("server error: %s", e.Message())}
-				default:
-					return errMsg{fmt.Errorf("unknown error: %s", e.Message())}
-				}
-			}
+			return errMsg{err}
 		}
 
 		f, err := os.Create(filename)
