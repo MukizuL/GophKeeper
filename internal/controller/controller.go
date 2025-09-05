@@ -3,19 +3,16 @@ package controller
 import (
 	pb "github.com/MukizuL/GophKeeper/internal/proto"
 	"github.com/MukizuL/GophKeeper/internal/services"
-	"github.com/MukizuL/GophKeeper/internal/storage"
 	"go.uber.org/fx"
 )
 
 type Controller struct {
-	storage  storage.Repository
-	services *services.Services
+	services services.ServicesI
 	pb.UnimplementedGophkeeperServer
 }
 
-func newController(storage storage.Repository, services *services.Services) *Controller {
+func newController(services services.ServicesI) *Controller {
 	return &Controller{
-		storage:  storage,
 		services: services,
 	}
 }

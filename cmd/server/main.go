@@ -11,6 +11,7 @@ import (
 	"github.com/MukizuL/GophKeeper/internal/server"
 	"github.com/MukizuL/GophKeeper/internal/services"
 	"github.com/MukizuL/GophKeeper/internal/storage"
+	"github.com/MukizuL/GophKeeper/internal/storage/file"
 	"github.com/MukizuL/GophKeeper/internal/storage/pgstorage"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"
@@ -50,6 +51,7 @@ func createApp() fx.Option {
 		services.Provide(),
 
 		pgstorage.Provide(),
+		file.Provide(),
 		storage.Provide(),
 		migration.Provide(),
 	)

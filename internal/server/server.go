@@ -40,8 +40,8 @@ func newGRPCServer(in GRPCFxIn) (*grpc.Server, error) {
 		in.Logger.Info("Starting GRPC server w/out TLS", zap.String("port", in.Cfg.GRPCPort))
 		s = grpc.NewServer(
 			grpc.ChainUnaryInterceptor(
-				in.Interceptor.Logger,
-				in.Interceptor.Auth,
+				in.Interceptor.LoggerUnary,
+				in.Interceptor.AuthUnary,
 			),
 		)
 	} else {
@@ -53,8 +53,11 @@ func newGRPCServer(in GRPCFxIn) (*grpc.Server, error) {
 
 		s = grpc.NewServer(
 			grpc.ChainUnaryInterceptor(
-				in.Interceptor.Logger,
-				in.Interceptor.Auth,
+				in.Interceptor.LoggerUnary,
+				in.Interceptor.AuthUnary,
+			),
+			grpc.ChainStreamInterceptor(
+				in.Interceptor.LoggerStream,
 			),
 			grpc.Creds(creds),
 		)

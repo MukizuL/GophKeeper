@@ -25,6 +25,7 @@ func newLogin() login {
 		t = textinput.New()
 		t.Cursor.Style = selectedItemStyle
 		t.CharLimit = 32
+		t.Width = 20
 
 		switch i {
 		case 0:
@@ -69,7 +70,13 @@ func updateLogin(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 			// If so, exit.
 			if s == "enter" && m.login.focusIndex == len(m.login.inputs) {
 				m.register.error = nil
-				token, err := Login(m.login.inputs[0].Value(), m.login.inputs[1].Value())
+				token, salt, err := Login(m.login.inputs[0].Value(), m.login.inputs[1].Value())
+				if err != nil {
+					m.login.error = err
+					return m, nil
+				}
+
+				dk, err := deriveKey(m.login.inputs[1].Value(), salt)
 				if err != nil {
 					m.login.error = err
 					return m, nil
@@ -79,6 +86,7 @@ func updateLogin(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 				m.login.success = true
 
 				m.token = token
+				m.dk = dk
 
 				return m, nil
 			}
@@ -102,20 +110,7 @@ func updateLogin(msg tea.Msg, m model) (tea.Model, tea.Cmd) {
 				m.login.focusIndex = len(m.login.inputs) + 1
 			}
 
-			cmds := make([]tea.Cmd, len(m.login.inputs))
-			for i := 0; i < len(m.login.inputs); i++ {
-				if i == m.login.focusIndex {
-					// Set focused state
-					cmds[i] = m.login.inputs[i].Focus()
-					m.login.inputs[i].PromptStyle = formSelectedStyle
-					m.login.inputs[i].TextStyle = formSelectedStyle
-					continue
-				}
-				// Remove focused state
-				m.login.inputs[i].Blur()
-				m.login.inputs[i].PromptStyle = formStyle
-				m.login.inputs[i].TextStyle = formStyle
-			}
+			cmds := focusOrBlur(m.login.inputs, m.login.focusIndex)
 
 			return m, tea.Batch(cmds...)
 		}
@@ -166,6 +161,7 @@ func resetLogin(m *model) {
 	m.login.error = nil
 	m.login.success = false
 	m.login.focusIndex = 0
-	m.login.inputs[0].Reset()
-	m.login.inputs[1].Reset()
+	for i := range m.login.inputs {
+		m.login.inputs[i].Reset()
+	}
 }

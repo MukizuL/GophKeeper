@@ -37,7 +37,7 @@ func Provide() fx.Option {
 	return fx.Provide(newService)
 }
 
-func (s Service) Logger(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
+func (s Service) LoggerUnary(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 	start := time.Now()
 
 	resp, err := handler(ctx, req)
@@ -58,12 +58,36 @@ func (s Service) Logger(ctx context.Context, req any, info *grpc.UnaryServerInfo
 	return resp, err
 }
 
-func (s Service) Auth(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
+func (s Service) LoggerStream(srv interface{}, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+	start := time.Now()
+
+	err := handler(srv, ss)
+
+	duration := time.Since(start)
+
+	var client string
+	pr, ok := peer.FromContext(ss.Context())
+	if ok {
+		client = pr.Addr.String()
+	}
+
+	s.logger.Info("GRPC request",
+		zap.String("method", info.FullMethod),
+		zap.String("client", client),
+		zap.Duration("time", duration))
+
+	return err
+}
+
+func (s Service) AuthUnary(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 	routes := []string{
-		"/shortener.Shortener/CreateGRPC",
-		"/shortener.Shortener/CreateBatchGRPC",
-		"/shortener.Shortener/GetUserURLsGRPC",
-		"/shortener.Shortener/DeleteGRPC",
+		"/gophkeeper.gophkeeper/CreatePassword",
+		"/gophkeeper.gophkeeper/CreateBank",
+		"/gophkeeper.gophkeeper/CreateText",
+		"/gophkeeper.gophkeeper/GetPasswords",
+		"/gophkeeper.gophkeeper/GetBank",
+		"/gophkeeper.gophkeeper/GetText",
+		"/gophkeeper.gophkeeper/GetData",
 	}
 
 	if !slices.Contains(routes, info.FullMethod) {

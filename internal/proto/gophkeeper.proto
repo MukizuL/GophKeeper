@@ -24,7 +24,102 @@ message AuthResponse {
 
 }
 
+// Create Password
+message CreatePasswordRequest {
+  bytes data = 1;
+}
+
+message CreatePasswordResponse {
+
+}
+
+// Create Bank
+message CreateBankRequest {
+  bytes data = 1;
+}
+
+message CreateBankResponse {
+
+}
+
+// Create Text
+message CreateTextRequest {
+  bytes data = 1;
+}
+
+message CreateTextResponse {
+
+}
+
+// Create Data
+message CreateDataRequest {
+  bytes filename = 1;
+  bytes chunk = 2;
+}
+
+message CreateDataResponse {
+
+}
+
+// Get Passwords
+message GetPasswordsRequest {
+
+}
+
+message GetPasswordsResponse {
+  repeated bytes data = 1;
+}
+
+// Get Bank
+message GetBankRequest {
+
+}
+
+message GetBankResponse {
+  repeated bytes data = 1;
+}
+
+// Get Text
+message GetTextRequest {
+
+}
+
+message GetTextResponse {
+  repeated bytes data = 1;
+}
+
+// Get Data
+message File {
+  string id = 1;
+  bytes filename = 2;
+}
+message GetDataRequest {
+
+}
+
+message GetDataResponse {
+  repeated File file = 1;
+}
+
+// Download file
+message DownloadRequest {
+  string id = 1;
+}
+
+message DownloadResponse {
+  bytes chunk = 2;
+}
+
 service gophkeeper {
   rpc Register(RegisterRequest) returns (RegisterResponse);
   rpc Authorize(AuthRequest) returns (AuthResponse);
+  rpc CreatePassword(CreatePasswordRequest) returns (CreatePasswordResponse);
+  rpc CreateBank(CreateBankRequest) returns (CreateBankResponse);
+  rpc CreateText(CreateTextRequest) returns (CreateTextResponse);
+  rpc CreateData(stream CreateDataRequest) returns (CreateDataResponse);
+  rpc GetPasswords(GetPasswordsRequest) returns (GetPasswordsResponse);
+  rpc GetBank(GetBankRequest) returns (GetBankResponse);
+  rpc GetText(GetTextRequest) returns (GetTextResponse);
+  rpc GetData(GetDataRequest) returns (GetDataResponse);
+  rpc Download(DownloadRequest) returns (stream DownloadResponse);
 }

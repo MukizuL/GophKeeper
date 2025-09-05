@@ -4,6 +4,8 @@
 // - protoc             v6.31.1
 // source: internal/proto/gophkeeper.proto
 
+//go:generate mockgen . Gophkeeper_CreateDataServer,Gophkeeper_DownloadServer
+
 package proto
 
 import (
@@ -19,8 +21,17 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Gophkeeper_Register_FullMethodName  = "/gophkeeper.gophkeeper/Register"
-	Gophkeeper_Authorize_FullMethodName = "/gophkeeper.gophkeeper/Authorize"
+	Gophkeeper_Register_FullMethodName       = "/gophkeeper.gophkeeper/Register"
+	Gophkeeper_Authorize_FullMethodName      = "/gophkeeper.gophkeeper/Authorize"
+	Gophkeeper_CreatePassword_FullMethodName = "/gophkeeper.gophkeeper/CreatePassword"
+	Gophkeeper_CreateBank_FullMethodName     = "/gophkeeper.gophkeeper/CreateBank"
+	Gophkeeper_CreateText_FullMethodName     = "/gophkeeper.gophkeeper/CreateText"
+	Gophkeeper_CreateData_FullMethodName     = "/gophkeeper.gophkeeper/CreateData"
+	Gophkeeper_GetPasswords_FullMethodName   = "/gophkeeper.gophkeeper/GetPasswords"
+	Gophkeeper_GetBank_FullMethodName        = "/gophkeeper.gophkeeper/GetBank"
+	Gophkeeper_GetText_FullMethodName        = "/gophkeeper.gophkeeper/GetText"
+	Gophkeeper_GetData_FullMethodName        = "/gophkeeper.gophkeeper/GetData"
+	Gophkeeper_Download_FullMethodName       = "/gophkeeper.gophkeeper/Download"
 )
 
 // GophkeeperClient is the client API for Gophkeeper service.
@@ -29,6 +40,15 @@ const (
 type GophkeeperClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	Authorize(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*AuthResponse, error)
+	CreatePassword(ctx context.Context, in *CreatePasswordRequest, opts ...grpc.CallOption) (*CreatePasswordResponse, error)
+	CreateBank(ctx context.Context, in *CreateBankRequest, opts ...grpc.CallOption) (*CreateBankResponse, error)
+	CreateText(ctx context.Context, in *CreateTextRequest, opts ...grpc.CallOption) (*CreateTextResponse, error)
+	CreateData(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[CreateDataRequest, CreateDataResponse], error)
+	GetPasswords(ctx context.Context, in *GetPasswordsRequest, opts ...grpc.CallOption) (*GetPasswordsResponse, error)
+	GetBank(ctx context.Context, in *GetBankRequest, opts ...grpc.CallOption) (*GetBankResponse, error)
+	GetText(ctx context.Context, in *GetTextRequest, opts ...grpc.CallOption) (*GetTextResponse, error)
+	GetData(ctx context.Context, in *GetDataRequest, opts ...grpc.CallOption) (*GetDataResponse, error)
+	Download(ctx context.Context, in *DownloadRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[DownloadResponse], error)
 }
 
 type gophkeeperClient struct {
@@ -59,12 +79,123 @@ func (c *gophkeeperClient) Authorize(ctx context.Context, in *AuthRequest, opts 
 	return out, nil
 }
 
+func (c *gophkeeperClient) CreatePassword(ctx context.Context, in *CreatePasswordRequest, opts ...grpc.CallOption) (*CreatePasswordResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreatePasswordResponse)
+	err := c.cc.Invoke(ctx, Gophkeeper_CreatePassword_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gophkeeperClient) CreateBank(ctx context.Context, in *CreateBankRequest, opts ...grpc.CallOption) (*CreateBankResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateBankResponse)
+	err := c.cc.Invoke(ctx, Gophkeeper_CreateBank_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gophkeeperClient) CreateText(ctx context.Context, in *CreateTextRequest, opts ...grpc.CallOption) (*CreateTextResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateTextResponse)
+	err := c.cc.Invoke(ctx, Gophkeeper_CreateText_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gophkeeperClient) CreateData(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[CreateDataRequest, CreateDataResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &Gophkeeper_ServiceDesc.Streams[0], Gophkeeper_CreateData_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[CreateDataRequest, CreateDataResponse]{ClientStream: stream}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Gophkeeper_CreateDataClient = grpc.ClientStreamingClient[CreateDataRequest, CreateDataResponse]
+
+func (c *gophkeeperClient) GetPasswords(ctx context.Context, in *GetPasswordsRequest, opts ...grpc.CallOption) (*GetPasswordsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetPasswordsResponse)
+	err := c.cc.Invoke(ctx, Gophkeeper_GetPasswords_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gophkeeperClient) GetBank(ctx context.Context, in *GetBankRequest, opts ...grpc.CallOption) (*GetBankResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetBankResponse)
+	err := c.cc.Invoke(ctx, Gophkeeper_GetBank_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gophkeeperClient) GetText(ctx context.Context, in *GetTextRequest, opts ...grpc.CallOption) (*GetTextResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetTextResponse)
+	err := c.cc.Invoke(ctx, Gophkeeper_GetText_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gophkeeperClient) GetData(ctx context.Context, in *GetDataRequest, opts ...grpc.CallOption) (*GetDataResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetDataResponse)
+	err := c.cc.Invoke(ctx, Gophkeeper_GetData_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gophkeeperClient) Download(ctx context.Context, in *DownloadRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[DownloadResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &Gophkeeper_ServiceDesc.Streams[1], Gophkeeper_Download_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[DownloadRequest, DownloadResponse]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Gophkeeper_DownloadClient = grpc.ServerStreamingClient[DownloadResponse]
+
 // GophkeeperServer is the server API for Gophkeeper service.
 // All implementations must embed UnimplementedGophkeeperServer
 // for forward compatibility.
 type GophkeeperServer interface {
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	Authorize(context.Context, *AuthRequest) (*AuthResponse, error)
+	CreatePassword(context.Context, *CreatePasswordRequest) (*CreatePasswordResponse, error)
+	CreateBank(context.Context, *CreateBankRequest) (*CreateBankResponse, error)
+	CreateText(context.Context, *CreateTextRequest) (*CreateTextResponse, error)
+	CreateData(grpc.ClientStreamingServer[CreateDataRequest, CreateDataResponse]) error
+	GetPasswords(context.Context, *GetPasswordsRequest) (*GetPasswordsResponse, error)
+	GetBank(context.Context, *GetBankRequest) (*GetBankResponse, error)
+	GetText(context.Context, *GetTextRequest) (*GetTextResponse, error)
+	GetData(context.Context, *GetDataRequest) (*GetDataResponse, error)
+	Download(*DownloadRequest, grpc.ServerStreamingServer[DownloadResponse]) error
 	mustEmbedUnimplementedGophkeeperServer()
 }
 
@@ -80,6 +211,33 @@ func (UnimplementedGophkeeperServer) Register(context.Context, *RegisterRequest)
 }
 func (UnimplementedGophkeeperServer) Authorize(context.Context, *AuthRequest) (*AuthResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Authorize not implemented")
+}
+func (UnimplementedGophkeeperServer) CreatePassword(context.Context, *CreatePasswordRequest) (*CreatePasswordResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePassword not implemented")
+}
+func (UnimplementedGophkeeperServer) CreateBank(context.Context, *CreateBankRequest) (*CreateBankResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateBank not implemented")
+}
+func (UnimplementedGophkeeperServer) CreateText(context.Context, *CreateTextRequest) (*CreateTextResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateText not implemented")
+}
+func (UnimplementedGophkeeperServer) CreateData(grpc.ClientStreamingServer[CreateDataRequest, CreateDataResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method CreateData not implemented")
+}
+func (UnimplementedGophkeeperServer) GetPasswords(context.Context, *GetPasswordsRequest) (*GetPasswordsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPasswords not implemented")
+}
+func (UnimplementedGophkeeperServer) GetBank(context.Context, *GetBankRequest) (*GetBankResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBank not implemented")
+}
+func (UnimplementedGophkeeperServer) GetText(context.Context, *GetTextRequest) (*GetTextResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetText not implemented")
+}
+func (UnimplementedGophkeeperServer) GetData(context.Context, *GetDataRequest) (*GetDataResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetData not implemented")
+}
+func (UnimplementedGophkeeperServer) Download(*DownloadRequest, grpc.ServerStreamingServer[DownloadResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method Download not implemented")
 }
 func (UnimplementedGophkeeperServer) mustEmbedUnimplementedGophkeeperServer() {}
 func (UnimplementedGophkeeperServer) testEmbeddedByValue()                    {}
@@ -138,6 +296,150 @@ func _Gophkeeper_Authorize_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Gophkeeper_CreatePassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GophkeeperServer).CreatePassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Gophkeeper_CreatePassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GophkeeperServer).CreatePassword(ctx, req.(*CreatePasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Gophkeeper_CreateBank_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateBankRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GophkeeperServer).CreateBank(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Gophkeeper_CreateBank_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GophkeeperServer).CreateBank(ctx, req.(*CreateBankRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Gophkeeper_CreateText_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateTextRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GophkeeperServer).CreateText(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Gophkeeper_CreateText_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GophkeeperServer).CreateText(ctx, req.(*CreateTextRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Gophkeeper_CreateData_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(GophkeeperServer).CreateData(&grpc.GenericServerStream[CreateDataRequest, CreateDataResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Gophkeeper_CreateDataServer = grpc.ClientStreamingServer[CreateDataRequest, CreateDataResponse]
+
+func _Gophkeeper_GetPasswords_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPasswordsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GophkeeperServer).GetPasswords(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Gophkeeper_GetPasswords_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GophkeeperServer).GetPasswords(ctx, req.(*GetPasswordsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Gophkeeper_GetBank_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBankRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GophkeeperServer).GetBank(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Gophkeeper_GetBank_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GophkeeperServer).GetBank(ctx, req.(*GetBankRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Gophkeeper_GetText_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTextRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GophkeeperServer).GetText(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Gophkeeper_GetText_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GophkeeperServer).GetText(ctx, req.(*GetTextRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Gophkeeper_GetData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDataRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GophkeeperServer).GetData(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Gophkeeper_GetData_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GophkeeperServer).GetData(ctx, req.(*GetDataRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Gophkeeper_Download_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(DownloadRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(GophkeeperServer).Download(m, &grpc.GenericServerStream[DownloadRequest, DownloadResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Gophkeeper_DownloadServer = grpc.ServerStreamingServer[DownloadResponse]
+
 // Gophkeeper_ServiceDesc is the grpc.ServiceDesc for Gophkeeper service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -153,7 +455,46 @@ var Gophkeeper_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "Authorize",
 			Handler:    _Gophkeeper_Authorize_Handler,
 		},
+		{
+			MethodName: "CreatePassword",
+			Handler:    _Gophkeeper_CreatePassword_Handler,
+		},
+		{
+			MethodName: "CreateBank",
+			Handler:    _Gophkeeper_CreateBank_Handler,
+		},
+		{
+			MethodName: "CreateText",
+			Handler:    _Gophkeeper_CreateText_Handler,
+		},
+		{
+			MethodName: "GetPasswords",
+			Handler:    _Gophkeeper_GetPasswords_Handler,
+		},
+		{
+			MethodName: "GetBank",
+			Handler:    _Gophkeeper_GetBank_Handler,
+		},
+		{
+			MethodName: "GetText",
+			Handler:    _Gophkeeper_GetText_Handler,
+		},
+		{
+			MethodName: "GetData",
+			Handler:    _Gophkeeper_GetData_Handler,
+		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "CreateData",
+			Handler:       _Gophkeeper_CreateData_Handler,
+			ClientStreams: true,
+		},
+		{
+			StreamName:    "Download",
+			Handler:       _Gophkeeper_Download_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "internal/proto/gophkeeper.proto",
 }
